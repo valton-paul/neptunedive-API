@@ -33,7 +33,7 @@ class Palanquee
     private ?Sortie $sortie = null;
 
     #[ORM\ManyToOne(inversedBy: 'palanquees')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     private ?Moniteur $encadrant = null;
 
     /**
