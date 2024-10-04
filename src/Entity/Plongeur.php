@@ -2,7 +2,8 @@
 
 namespace App\Entity;
 
-use App\Enum\NiveauPlongee;
+use App\Enum\NiveauPlongeeAutonome;
+use App\Enum\NiveauPlongeeEncadre;
 use App\Repository\PlongeurRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -47,8 +48,8 @@ class Plongeur implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?bool $formation = null;
 
-    #[ORM\Column(type: 'string', length: 25, enumType: NiveauPlongee::class)]
-    private ?NiveauPlongee $niveauPlongee = null;
+    #[ORM\Column(type: 'integer', nullable: true, enumType: NiveauPlongeeAutonome::class)]
+    private ?NiveauPlongeeAutonome $niveauPlongee = null;
 
     /**
      * @var Collection<int, Commentaire>
@@ -67,6 +68,9 @@ class Plongeur implements UserInterface, PasswordAuthenticatedUserInterface
      */
     #[ORM\ManyToMany(targetEntity: Palanquee::class, mappedBy: 'assigner')]
     private Collection $palanqueesParticipees;
+
+    #[ORM\Column(type: 'integer', nullable: true, enumType: NiveauPlongeeEncadre::class)]
+    private ?NiveauPlongeeEncadre $niveauPlongeeEncadre = null;
 
     public function __construct()
     {
@@ -186,12 +190,12 @@ class Plongeur implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getNiveauPlongee(): ?NiveauPlongee
+    public function getNiveauPlongee(): ?NiveauPlongeeAutonome
     {
         return $this->niveauPlongee;
     }
 
-    public function setNiveauPlongee(NiveauPlongee $niveauPlongee): static
+    public function setNiveauPlongee(NiveauPlongeeAutonome $niveauPlongee): static
     {
         $this->niveauPlongee = $niveauPlongee;
 
@@ -278,6 +282,18 @@ class Plongeur implements UserInterface, PasswordAuthenticatedUserInterface
         if ($this->palanqueesParticipees->removeElement($palanqueesParticipee)) {
             $palanqueesParticipee->removeAssigner($this);
         }
+
+        return $this;
+    }
+
+    public function getNiveauPlongeeEncadre(): ?NiveauPlongeeEncadre
+    {
+        return $this->niveauPlongeeEncadre;
+    }
+
+    public function setNiveauPlongeeEncadre(?NiveauPlongeeEncadre $niveauPlongeeEncadre): static
+    {
+        $this->niveauPlongeeEncadre = $niveauPlongeeEncadre;
 
         return $this;
     }
