@@ -48,6 +48,9 @@ class Sortie
     #[ORM\ManyToMany(targetEntity: Plongeur::class, inversedBy: 'sorties')]
     private Collection $inscriptions;
 
+    #[ORM\ManyToOne(inversedBy: 'sorties')]
+    private ?Bateau $bateau = null;
+
     public function __construct()
     {
         $this->palanquees = new ArrayCollection();
@@ -181,6 +184,18 @@ class Sortie
     public function removeInscription(Plongeur $inscription): static
     {
         $this->inscriptions->removeElement($inscription);
+
+        return $this;
+    }
+
+    public function getBateau(): ?Bateau
+    {
+        return $this->bateau;
+    }
+
+    public function setBateau(?Bateau $bateau): static
+    {
+        $this->bateau = $bateau;
 
         return $this;
     }
