@@ -1,0 +1,46 @@
+<?php
+
+namespace App\EventListener;
+
+use App\Entity\Commentaire;
+use App\Entity\Palanquee;
+use App\Exception\AlreadyExistsException;
+use App\Exception\NotAllowedException;
+use App\Repository\CommentaireRepository;
+use Doctrine\Persistence\Event\LifecycleEventArgs;
+
+class CommentaireListener
+{
+
+    public function __construct(
+        private CommentaireRepository $commentaireRepository
+    )
+    {
+    }
+
+
+    public function prePersist(Commentaire $commentaire, LifecycleEventArgs $event): void
+    {
+        $sortie = $commentaire->getSortie();
+        $moniteur = $commentaire->getMoniteur();
+        $plongeur = $commentaire->getPlongeur();
+
+        // Vérifie si le moniteur a bien encadré le plongeur lors de la sortie
+        if ($sortie->getPalanquees()->filter(
+                function (Palanquee $p) use ($moniteur, $plongeur) {
+                    return $p->getEncadrant() === $moniteur && $p->getAssigner()->contains($plongeur);
+                }
+            )->count() === 0) {
+            throw new NotAllowedException($moniteur->getEmail() . " hasn't supervised this diver.");
+        }
+        $possible_commentaire = $this->commentaireRepository->findOneBy([
+            'moniteur' => $moniteur->getId(),
+            'sortie' => $sortie->getId(),
+            'plongeur' => $plongeur->getId()
+        ]);
+        if ($possible_commentaire) {
+            throw new AlreadyExistsException();
+        }
+    }
+
+}
