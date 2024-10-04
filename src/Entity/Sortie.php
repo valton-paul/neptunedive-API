@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Enum\Creneaux;
 use App\Repository\SortieRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -25,8 +26,8 @@ class Sortie
     #[ORM\Column(length: 255)]
     private ?string $lieu = null;
 
-    #[ORM\Column(length: 50)]
-    private ?string $creneau = null;
+    #[ORM\Column(type: 'string', length: 50, enumType: Creneaux::class)]
+    private ?Creneaux $creneau = null;
 
     #[ORM\ManyToOne(inversedBy: 'sorties')]
     #[ORM\JoinColumn(nullable: false)]
@@ -101,12 +102,12 @@ class Sortie
         return $this;
     }
 
-    public function getCreneau(): ?string
+    public function getCreneau(): ?Creneaux
     {
         return $this->creneau;
     }
 
-    public function setCreneau(string $creneau): static
+    public function setCreneau(Creneaux $creneau): static
     {
         $this->creneau = $creneau;
 
