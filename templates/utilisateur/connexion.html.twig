@@ -1,0 +1,22 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Connexion{% endblock %}
+
+{% block body %}
+    <main>
+        <form action="" method="post">
+            <fieldset>
+                <div>
+                    <label for="email">Email</label>
+                    <input id="email" type="text" name="_username" value={{ last_email_tried }} required/>
+                </div>
+                <div class="access-container">
+                    <label for="password">Mot de passe</label>
+                    <input id="password" type="password" name="_password" required/>
+                </div>
+                <button type="submit">Se connecter</button>
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+            </fieldset>
+        </form>
+    </main>
+{% endblock %}
