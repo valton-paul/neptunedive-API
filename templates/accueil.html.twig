@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Connexion{% endblock %}
+
+{% block body %}
+    <main>
+        <form method="post" action="{{ path('_logout_main') }}">
+            <button>Déconnexion</button>
+        </form>
+    </main>
+{% endblock %}
