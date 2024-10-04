@@ -4,8 +4,10 @@ namespace App\Service;
 
 use App\Entity\Bateau;
 use App\Entity\Sortie;
+use App\Enum\Creneaux;
 use App\Exception\NotAllowedException;
 use App\Exception\NotFoundException;
+use Doctrine\Common\Collections\Collection;
 
 interface BateauManagerInterface
 {
@@ -19,11 +21,15 @@ interface BateauManagerInterface
 
     /**
      * @param Bateau $bateau
-     * @return mixed
-     * @throws NotFoundException
-     * TODO Que faire si un bateau est supprimé alors qu'il est utilisé dans des sorties
+     * @return void
+     * @throws NotFoundException TODO Que faire si un bateau est supprimé alors qu'il est utilisé dans des sorties
      */
     function delete(Bateau $bateau): void;
 
-    function areAvailable(Sortie $sortie): bool;
+    /**
+     * @param \DateTime $date
+     * @param Creneaux $creneaux
+     * @return Collection
+     */
+    function areAvailable(\DateTime $date, Creneaux $creneaux): Collection;
 }

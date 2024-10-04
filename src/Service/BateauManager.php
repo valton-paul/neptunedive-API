@@ -4,16 +4,20 @@ namespace App\Service;
 
 use App\Entity\Bateau;
 use App\Entity\Sortie;
+use App\Enum\Creneaux;
 use App\Exception\NotAllowedException;
 use App\Exception\NotFoundException;
+use App\Repository\BateauRepository;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
 class BateauManager implements BateauManagerInterface
 {
 
     public function __construct(
-        private EntityManagerInterface $entityManager
+        private EntityManagerInterface $entityManager,
     )
     {}
 
@@ -41,8 +45,13 @@ class BateauManager implements BateauManagerInterface
         $this->entityManager->flush();
     }
 
-    function areAvailable(Sortie $sortie): bool
+    /**
+     * @param \DateTime $date date of the event
+     * @param Creneaux $creneaux moment of the day
+     * @return Collection return list of boat available
+     */
+    function areAvailable(\DateTime $date, Creneaux $creneaux): Collection
     {
-        // TODO: Implement areAvailable() method.
+        return $this->entityManager->getRepository(Bateau::class)->findAvailableBoats($date, $creneaux);
     }
 }
