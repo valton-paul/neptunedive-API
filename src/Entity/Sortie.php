@@ -51,6 +51,9 @@ class Sortie
     #[ORM\ManyToOne(inversedBy: 'sorties')]
     private ?Bateau $bateau = null;
 
+    #[ORM\ManyToOne]
+    private ?Moniteur $piloteBateau = null;
+
     public function __construct()
     {
         $this->palanquees = new ArrayCollection();
@@ -196,6 +199,18 @@ class Sortie
     public function setBateau(?Bateau $bateau): static
     {
         $this->bateau = $bateau;
+
+        return $this;
+    }
+
+    public function getPiloteBateau(): ?Moniteur
+    {
+        return $this->piloteBateau;
+    }
+
+    public function setPiloteBateau(?Moniteur $piloteBateau): static
+    {
+        $this->piloteBateau = $piloteBateau;
 
         return $this;
     }
