@@ -24,6 +24,9 @@ class Bateau
     #[ORM\OneToMany(targetEntity: Sortie::class, mappedBy: 'bateau')]
     private Collection $sorties;
 
+    #[ORM\Column]
+    private ?int $nbPlaces = null;
+
     public function __construct()
     {
         $this->sorties = new ArrayCollection();
@@ -72,6 +75,18 @@ class Bateau
                 $sorty->setBateau(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getNbPlaces(): ?int
+    {
+        return $this->nbPlaces;
+    }
+
+    public function setNbPlaces(int $nbPlaces): static
+    {
+        $this->nbPlaces = $nbPlaces;
 
         return $this;
     }
