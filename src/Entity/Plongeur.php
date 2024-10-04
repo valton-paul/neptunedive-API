@@ -49,7 +49,7 @@ class Plongeur implements UserInterface, PasswordAuthenticatedUserInterface
     private ?bool $formation = null;
 
     #[ORM\Column(type: 'integer', nullable: true, enumType: NiveauPlongeeAutonome::class)]
-    private ?NiveauPlongeeAutonome $niveauPlongee = null;
+    private ?NiveauPlongeeAutonome $niveauPlongeeAutonome = null;
 
     /**
      * @var Collection<int, Commentaire>
@@ -190,14 +190,14 @@ class Plongeur implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getNiveauPlongee(): ?NiveauPlongeeAutonome
+    public function getNiveauPlongeeAutonome(): ?NiveauPlongeeAutonome
     {
-        return $this->niveauPlongee;
+        return $this->niveauPlongeeAutonome;
     }
 
-    public function setNiveauPlongee(NiveauPlongeeAutonome $niveauPlongee): static
+    public function setNiveauPlongeeAutonome(NiveauPlongeeAutonome $niveauPlongeeAutonome): static
     {
-        $this->niveauPlongee = $niveauPlongee;
+        $this->niveauPlongeeAutonome = $niveauPlongeeAutonome;
 
         return $this;
     }
