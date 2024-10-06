@@ -1,0 +1,61 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Créer une Sortie{% endblock %}
+
+{% block body %}
+    <h1>Créer une nouvelle Sortie</h1>
+
+    {{ form_start(form) }}
+    <div class="form-group">
+        {{ form_row(form.type, {
+            'label': 'Type de sortie',
+            'attr': {'class': 'form-control'}
+        }) }}
+    </div>
+
+    <div class="form-group">
+        {{ form_row(form.dateSortie, {
+            'label': 'Date de la sortie',
+            'attr': {'class': 'form-control'}
+        }) }}
+    </div>
+
+    <div class="form-group">
+        {{ form_row(form.lieu, {
+            'label': 'Lieu de la sortie',
+            'attr': {'class': 'form-control'}
+        }) }}
+    </div>
+
+    <div class="form-group">
+        {{ form_row(form.creneau, {
+            'label': 'Créneau',
+            'attr': {'class': 'form-control'}
+        }) }}
+    </div>
+
+    <div class="form-group">
+        {{ form_row(form.securiteSurface, {
+            'label': 'Sécurité en surface',
+            'attr': {'class': 'form-control'}
+        }) }}
+    </div>
+
+    {#<div class="form-group">
+        {{ form_row(form.bateau, {
+            'label': 'Bateau',
+            'attr': {'class': 'form-control'}
+        }) }}
+    </div>#}
+
+    <div class="form-group">
+        {{ form_row(form.piloteBateau, {
+            'label': 'Pilote du bateau',
+            'attr': {'class': 'form-control'}
+        }) }}
+    </div>
+
+    <button class="btn btn-primary">Créer la sortie</button>
+    {{ form_end(form) }}
+
+{% endblock %}

@@ -33,6 +33,13 @@ class PlongeurRepository extends ServiceEntityRepository implements PasswordUpgr
         $this->getEntityManager()->flush();
     }
 
+    public function remove(Plongeur $plongeur): void
+    {
+        $this->getEntityManager()->remove($plongeur);
+        $this->getEntityManager()->flush();
+    }
+
+
     //    /**
     //     * @return Plongeur[] Returns an array of Plongeur objects
     //     */

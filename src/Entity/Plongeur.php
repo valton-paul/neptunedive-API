@@ -195,7 +195,7 @@ class Plongeur implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->niveauPlongeeAutonome;
     }
 
-    public function setNiveauPlongeeAutonome(NiveauPlongeeAutonome $niveauPlongeeAutonome): static
+    public function setNiveauPlongeeAutonome(?NiveauPlongeeAutonome $niveauPlongeeAutonome): static
     {
         $this->niveauPlongeeAutonome = $niveauPlongeeAutonome;
 

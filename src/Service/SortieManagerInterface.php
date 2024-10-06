@@ -8,6 +8,8 @@ use App\Exception\AlreadyExistsException;
 use App\Exception\MemberNotFoundException;
 use App\Exception\NotAllowedException;
 use DateException;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 interface SortieManagerInterface
 {
@@ -31,10 +33,24 @@ interface SortieManagerInterface
 
     /**
      * @param Sortie $sortie
+     * @param FormInterface $form
      * @return void
      * @throws DateException if the date has been passed
+     * @throws NotAllowedException if the user is not allowed to create a sortie
+     * @throws \Exception
      */
-    function processNew(Sortie $sortie): void;
+    function processNew(Sortie $sortie, FormInterface $form): void;
+
+    /**
+     * @param Sortie $sortie
+     * @param FormInterface $form
+     * @return void
+     * @throws DateException if the date has been passed
+     * @throws NotAllowedException if the user is not allowed to edit the sortie
+     * @throws \Exception
+     */
+    function processEdit(Sortie $sortie, FormInterface $form): void;
+
 
     /**
      * @param Sortie $sortie

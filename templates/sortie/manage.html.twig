@@ -1,0 +1,60 @@
+
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier une Sortie{% endblock %}
+
+{% block body %}
+    <h1>Modifier la Sortie</h1>
+
+    {% for message in app.session.flashBag.get('warning') %}
+        <div class="alert alert-warning">{{ message }}</div>
+    {% endfor %}
+
+    {{ form_start(form) }}
+    <div class="form-group">
+        {{ form_label(form.type) }}
+        {{ form_widget(form.type, { 'attr': { 'class': 'form-control' } }) }}
+        {{ form_errors(form.type) }}
+    </div>
+
+    <div class="form-group">
+        {{ form_label(form.dateSortie) }}
+        {{ form_widget(form.dateSortie, { 'attr': { 'class': 'form-control' } }) }}
+        {{ form_errors(form.dateSortie) }}
+    </div>
+
+    <div class="form-group">
+        {{ form_label(form.lieu) }}
+        {{ form_widget(form.lieu, { 'attr': { 'class': 'form-control' } }) }}
+        {{ form_errors(form.lieu) }}
+    </div>
+
+    <div class="form-group">
+        {{ form_label(form.inscriptions) }}
+        {{ form_widget(form.inscriptions, { 'attr': { 'class': 'form-control' } }) }}
+        {{ form_errors(form.inscriptions) }}
+    </div>
+
+    <div class="form-group">
+        {{ form_label(form.creneau) }}
+        {{ form_widget(form.creneau, { 'attr': { 'class': 'form-control' } }) }}
+        {{ form_errors(form.creneau) }}
+    </div>
+
+    <div class="form-group">
+        {{ form_label(form.bateau) }}
+        {{ form_widget(form.bateau, { 'attr': { 'class': 'form-control' } }) }}
+        {{ form_errors(form.bateau) }}
+    </div>
+
+    <div class="form-group">
+        {{ form_label(form.piloteBateau) }}
+        {{ form_widget(form.piloteBateau, { 'attr': { 'class': 'form-control' } }) }}
+        {{ form_errors(form.piloteBateau) }}
+    </div>
+
+    <button class="btn btn-primary">Sauvegarder les modifications</button>
+    {{ form_end(form) }}
+
+    <a href="{{ path('sortie_list') }}" class="btn btn-secondary">Retour à la liste des sorties</a>
+{% endblock %}

@@ -29,7 +29,7 @@ class Sortie
     #[ORM\Column(type: 'string', length: 50, enumType: Creneaux::class)]
     private ?Creneaux $creneau = null;
 
-    #[ORM\ManyToOne(inversedBy: 'sorties')]
+    #[ORM\ManyToOne(targetEntity: Moniteur::class,inversedBy: 'sortiesDP')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Moniteur $directeurPlongee = null;
 

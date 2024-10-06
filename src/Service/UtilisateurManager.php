@@ -4,16 +4,19 @@ namespace App\Service;
 
 use App\Entity\Moniteur;
 use App\Entity\Plongeur;
+use App\Enum\NiveauMoniteur;
 use App\Exception\AlreadyExistsException;
 use App\Exception\NotAllowedException;
 use App\Repository\PlongeurRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class UtilisateurManager implements UtilisateurManagerInterface
 {
     public function __construct(
         private UserPasswordHasherInterface $passwordHasher,
-        private PlongeurRepository $plongeurRepository
+        private PlongeurRepository $plongeurRepository,
+        private EntityManagerInterface $entityManager
     )
     {
     }
@@ -49,6 +52,6 @@ class UtilisateurManager implements UtilisateurManagerInterface
      */
     function makeSupervisor(Plongeur $plongeur): Moniteur
     {
-        // TODO: Implement makeSupervisor() method.
+        //TODO : a faire
     }
 }
