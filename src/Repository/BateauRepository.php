@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Bateau;
+use App\Enum\Creneaux;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -15,6 +16,28 @@ class BateauRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Bateau::class);
     }
+
+    public function findAllBoatsWithSorties() {
+        $query = $this->createQueryBuilder('b');
+
+        $query->leftJoin('b.sortie', 's')
+            ->addSelect('s');
+
+        return $query->getQuery()->getResult();
+    }
+
+    public function findAvailableBoats(\DateTime $date, Creneaux $creneaux){
+        return $this->createQueryBuilder('b')
+            ->leftJoin('b.sortie', 's')
+            ->addSelect('s')
+            ->where('s.dateSortie IS NULL')
+            ->orWhere('s.dateSortie != :date OR s.creneau != :creneau')
+            ->setParameter('date', $date)
+            ->setParameter('creneau', $creneaux)
+            ->getQuery()
+            ->getResult();
+    }
+
 
     //    /**
     //     * @return Bateau[] Returns an array of Bateau objects

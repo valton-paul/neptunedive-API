@@ -2,7 +2,6 @@
 
 namespace App\Service;
 
-use App\Entity\Moniteur;
 use App\Entity\Plongeur;
 use App\Enum\NiveauMoniteur;
 use App\Exception\AlreadyExistsException;
@@ -46,11 +45,11 @@ class UtilisateurManager implements UtilisateurManagerInterface
 
     /**
      * @param Plongeur $plongeur
-     * @return Moniteur
+     * @return Plongeur
      * @throws NotAllowedException If $plongeur diving level is below N2
      * @throws AlreadyExistsException If $plongeur is already a supervisor
      */
-    function makeSupervisor(Plongeur $plongeur): Moniteur
+    function makeSupervisor(Plongeur $plongeur): Plongeur
     {
         //TODO : a faire
     }

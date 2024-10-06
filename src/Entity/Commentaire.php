@@ -30,7 +30,7 @@ class Commentaire
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Moniteur $moniteur = null;
+    private ?Plongeur $moniteur = null;
 
     public function getId(): ?int
     {
@@ -85,12 +85,12 @@ class Commentaire
         return $this;
     }
 
-    public function getMoniteur(): ?Moniteur
+    public function getMoniteur(): ?Plongeur
     {
         return $this->moniteur;
     }
 
-    public function setMoniteur(?Moniteur $moniteur): static
+    public function setMoniteur(?Plongeur $moniteur): static
     {
         $this->moniteur = $moniteur;
 
