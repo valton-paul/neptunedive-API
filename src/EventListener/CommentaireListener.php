@@ -19,8 +19,16 @@ class CommentaireListener
     }
 
 
-    public function prePersist(Commentaire $commentaire, LifecycleEventArgs $event): void
+    public function prePersist(LifecycleEventArgs $event): void
     {
+
+        $commentaire = $event->getObject();
+
+        // Vérifiez si l'entité est un Commentaire
+        if (!$commentaire instanceof Commentaire) {
+            return; // Si ce n'est pas un Commentaire, ne faites rien
+        }
+
         $sortie = $commentaire->getSortie();
         $moniteur = $commentaire->getMoniteur();
         $plongeur = $commentaire->getPlongeur();

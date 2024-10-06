@@ -121,9 +121,11 @@ class CommentaireManagerTest extends TestCase
             ->method('findOneBy')
             ->willReturn($commentaire); // Simule un commentaire déjà existant
 
+        $lifeCycleEventArgs = $this->createMock(LifecycleEventArgs::class);
+        $lifeCycleEventArgs->method('getObject')->willReturn($commentaire);
+
         $this->commentaireListener->prePersist(
-            $commentaire,
-            $this->createMock(LifecycleEventArgs::class)
+            $lifeCycleEventArgs
         );
     }
 
@@ -141,9 +143,11 @@ class CommentaireManagerTest extends TestCase
 
         $this->expectException(NotAllowedException::class);
 
+        $lifeCycleEventArgs = $this->createMock(LifecycleEventArgs::class);
+        $lifeCycleEventArgs->method('getObject')->willReturn($commentaire);
+
         $this->commentaireListener->prePersist(
-            $commentaire,
-            $this->createMock(LifecycleEventArgs::class)
+            $lifeCycleEventArgs
         );
     }
 
@@ -165,9 +169,11 @@ class CommentaireManagerTest extends TestCase
 
         $this->expectException(NotAllowedException::class);
 
+        $lifeCycleEventArgs = $this->createMock(LifecycleEventArgs::class);
+        $lifeCycleEventArgs->method('getObject')->willReturn($commentaire);
+
         $this->commentaireListener->prePersist(
-            $commentaire,
-            $this->createMock(LifecycleEventArgs::class)
+            $lifeCycleEventArgs
         );
     }
 
@@ -188,10 +194,11 @@ class CommentaireManagerTest extends TestCase
             $message);
 
         $this->expectException(NotAllowedException::class);
+        $lifeCycleEventArgs = $this->createMock(LifecycleEventArgs::class);
+        $lifeCycleEventArgs->method('getObject')->willReturn($commentaire);
 
         $this->commentaireListener->prePersist(
-            $commentaire,
-            $this->createMock(LifecycleEventArgs::class)
+            $lifeCycleEventArgs
         );
     }
 
