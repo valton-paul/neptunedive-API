@@ -31,11 +31,11 @@ class Sortie
 
     #[ORM\ManyToOne(inversedBy: 'sorties')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Moniteur $directeurPlongee = null;
+    private ?Plongeur $directeurPlongee = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Moniteur $securiteSurface = null;
+    private ?Plongeur $securiteSurface = null;
 
     /**
      * @var Collection<int, Palanquee>
@@ -53,7 +53,7 @@ class Sortie
     private ?Bateau $bateau = null;
 
     #[ORM\ManyToOne]
-    private ?Moniteur $piloteBateau = null;
+    private ?Plongeur $piloteBateau = null;
 
     public function __construct()
     {
@@ -114,24 +114,24 @@ class Sortie
         return $this;
     }
 
-    public function getDirecteurPlongee(): ?Moniteur
+    public function getDirecteurPlongee(): ?Plongeur
     {
         return $this->directeurPlongee;
     }
 
-    public function setDirecteurPlongee(?Moniteur $directeurPlongee): static
+    public function setDirecteurPlongee(?Plongeur $directeurPlongee): static
     {
         $this->directeurPlongee = $directeurPlongee;
 
         return $this;
     }
 
-    public function getSecuriteSurface(): ?Moniteur
+    public function getSecuriteSurface(): ?Plongeur
     {
         return $this->securiteSurface;
     }
 
-    public function setSecuriteSurface(?Moniteur $securiteSurface): static
+    public function setSecuriteSurface(?Plongeur $securiteSurface): static
     {
         $this->securiteSurface = $securiteSurface;
 
@@ -204,12 +204,12 @@ class Sortie
         return $this;
     }
 
-    public function getPiloteBateau(): ?Moniteur
+    public function getPiloteBateau(): ?Plongeur
     {
         return $this->piloteBateau;
     }
 
-    public function setPiloteBateau(?Moniteur $piloteBateau): static
+    public function setPiloteBateau(?Plongeur $piloteBateau): static
     {
         $this->piloteBateau = $piloteBateau;
 

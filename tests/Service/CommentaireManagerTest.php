@@ -3,7 +3,6 @@
 namespace App\Tests\Service;
 
 use App\Entity\Commentaire;
-use App\Entity\Moniteur;
 use App\Entity\Palanquee;
 use App\Entity\Plongeur;
 use App\Entity\Sortie;
@@ -18,8 +17,6 @@ use App\Repository\CommentaireRepository;
 use App\Service\CommentaireManager;
 use App\Service\CommentaireManagerInterface;
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
-use Doctrine\Common\EventArgs;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\Event\LifecycleEventArgs;
 use PHPUnit\Framework\TestCase;
@@ -27,7 +24,7 @@ use PHPUnit\Framework\TestCase;
 class CommentaireManagerTest extends TestCase
 {
     private CommentaireManagerInterface $commentaireManager;
-    private Moniteur $moniteur;
+    private Plongeur $moniteur;
     private Sortie $sortie;
     private Plongeur $plongeur;
     private Palanquee $palanquee;
@@ -47,7 +44,7 @@ class CommentaireManagerTest extends TestCase
         $this->commentaireManager = new CommentaireManager(
             $this->entityManager,
         );
-        $this->moniteur = (new Moniteur())
+        $this->moniteur = (new Plongeur())
             ->setNiveauMoniteur(NiveauMoniteur::E4)
             ->setEmail("moniteur@gmail.com")
             ->setNom("Charotte")

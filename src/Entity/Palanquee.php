@@ -34,7 +34,7 @@ class Palanquee
 
     #[ORM\ManyToOne(inversedBy: 'palanquees')]
     #[ORM\JoinColumn(nullable: true)]
-    private ?Moniteur $encadrant = null;
+    private ?Plongeur $encadrant = null;
 
     /**
      * @var Collection<int, Plongeur>
@@ -112,12 +112,12 @@ class Palanquee
         return $this;
     }
 
-    public function getEncadrant(): ?Moniteur
+    public function getEncadrant(): ?Plongeur
     {
         return $this->encadrant;
     }
 
-    public function setEncadrant(?Moniteur $encadrant): static
+    public function setEncadrant(?Plongeur $encadrant): static
     {
         $this->encadrant = $encadrant;
 

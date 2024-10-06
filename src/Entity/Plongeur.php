@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Enum\NiveauMoniteur;
 use App\Enum\NiveauPlongeeAutonome;
 use App\Enum\NiveauPlongeeEncadre;
 use App\Repository\PlongeurRepository;
@@ -13,10 +14,6 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: PlongeurRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
-#[ORM\InheritanceType('JOINED')]
-#[ORM\DiscriminatorColumn(name: 'type', type: 'string')]
-#[ORM\DiscriminatorMap(['plongeur' => Plongeur::class, 'moniteur' => Moniteur::class])]
-
 class Plongeur implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -72,11 +69,33 @@ class Plongeur implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'integer', nullable: true, enumType: NiveauPlongeeEncadre::class)]
     private ?NiveauPlongeeEncadre $niveauPlongeeEncadre = null;
 
+
+    #[ORM\Column(type: 'string', length: 25, enumType: NiveauMoniteur::class)]
+    private ?NiveauMoniteur $niveauMoniteur = null;
+
+    /**
+     * @var Collection<int, Sortie>
+     */
+    #[ORM\OneToMany(targetEntity: Sortie::class, mappedBy: 'directeurPlongee')]
+    private Collection $sortiesDP;
+
+    /**
+     * @var Collection<int, Palanquee>
+     */
+    #[ORM\OneToMany(targetEntity: Palanquee::class, mappedBy: 'encadrant')]
+    private Collection $palanquees;
+
+    #[ORM\Column]
+    private ?bool $isMoniteur = null;
+
+
     public function __construct()
     {
         $this->commentaires = new ArrayCollection();
         $this->sorties = new ArrayCollection();
         $this->palanqueesParticipees = new ArrayCollection();
+        $this->sortiesDP = new ArrayCollection();
+        $this->palanquees = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -235,7 +254,7 @@ class Plongeur implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @return Collection<int, Sortie>
      */
-    public function getSortiesDP(): Collection
+    public function getSorties(): Collection
     {
         return $this->sorties;
     }
@@ -294,6 +313,91 @@ class Plongeur implements UserInterface, PasswordAuthenticatedUserInterface
     public function setNiveauPlongeeEncadre(?NiveauPlongeeEncadre $niveauPlongeeEncadre): static
     {
         $this->niveauPlongeeEncadre = $niveauPlongeeEncadre;
+
+        return $this;
+    }
+
+
+    public function getNiveauMoniteur(): ?NiveauMoniteur
+    {
+        return $this->niveauMoniteur;
+    }
+
+    public function setNiveauMoniteur(NiveauMoniteur $niveauMoniteur): static
+    {
+        $this->niveauMoniteur = $niveauMoniteur;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Sortie>
+     */
+    public function getSortiesDP(): Collection
+    {
+        return $this->sortiesDP;
+    }
+
+    public function addSortieDP(Sortie $sorty): static
+    {
+        if (!$this->sortiesDP->contains($sorty)) {
+            $this->sortiesDP->add($sorty);
+            $sorty->setDirecteurPlongee($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSortieDP(Sortie $sorty): static
+    {
+        if ($this->sortiesDP->removeElement($sorty)) {
+            // set the owning side to null (unless already changed)
+            if ($sorty->getDirecteurPlongee() === $this) {
+                $sorty->setDirecteurPlongee(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Palanquee>
+     */
+    public function getPalanquees(): Collection
+    {
+        return $this->palanquees;
+    }
+
+    public function addPalanquee(Palanquee $palanquee): static
+    {
+        if (!$this->palanquees->contains($palanquee)) {
+            $this->palanquees->add($palanquee);
+            $palanquee->setEncadrant($this);
+        }
+
+        return $this;
+    }
+
+    public function removePalanquee(Palanquee $palanquee): static
+    {
+        if ($this->palanquees->removeElement($palanquee)) {
+            // set the owning side to null (unless already changed)
+            if ($palanquee->getEncadrant() === $this) {
+                $palanquee->setEncadrant(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function isMoniteur(): ?bool
+    {
+        return $this->isMoniteur;
+    }
+
+    public function setMoniteur(bool $isMoniteur): static
+    {
+        $this->isMoniteur = $isMoniteur;
 
         return $this;
     }

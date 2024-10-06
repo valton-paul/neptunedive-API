@@ -3,14 +3,8 @@
 namespace App\Service;
 
 use App\Entity\Commentaire;
-use App\Entity\Moniteur;
-use App\Entity\Palanquee;
 use App\Entity\Plongeur;
 use App\Entity\Sortie;
-use App\Exception\AlreadyExistsException;
-use App\Exception\NotAllowedException;
-use App\Repository\CommentaireRepository;
-use App\Service\CommentaireManagerInterface;
 use Doctrine\ORM\EntityManagerInterface;
 
 class CommentaireManager implements CommentaireManagerInterface
@@ -26,7 +20,7 @@ class CommentaireManager implements CommentaireManagerInterface
     /**
      * @inheritDoc
      */
-    function create(Sortie $sortie, Plongeur $plongeur, Moniteur $moniteur, string $message): Commentaire
+    function create(Sortie $sortie, Plongeur $plongeur, Plongeur $moniteur, string $message): Commentaire
     {
         $commentaire = new Commentaire();
         $commentaire->setPlongeur($plongeur);
