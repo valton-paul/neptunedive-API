@@ -4,8 +4,10 @@
 
 {% block body %}
     <main>
-
         {% if sorties is defined %}
+            {% if is_granted('ROLE_MONITEUR') %}
+                <a href="{{ path('createSortie') }}">Ajouter une sortie</a>
+            {% endif %}
             <h1>Les sorties à venir</h1>
             <ul>
                 {% for sortie in sorties %}
@@ -17,6 +19,5 @@
         {% else %}
             <p>Aucune sortie à venir</p>
         {% endif %}
-
     </main>
 {% endblock %}
