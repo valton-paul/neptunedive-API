@@ -51,8 +51,11 @@ class UtilisateurManager implements UtilisateurManagerInterface
      * @throws NotAllowedException If $plongeur diving level is below N2
      * @throws AlreadyExistsException If $plongeur is already a supervisor
      */
-    function makeSupervisor(Plongeur $plongeur): Plongeur
+    function makeSupervisor(Plongeur $plongeur, NiveauMoniteur $niveauMoniteur): Plongeur
     {
-        //TODO : a faire
+        $plongeur->setMoniteur(true);
+        $plongeur->setNiveauMoniteur($niveauMoniteur);
+        $this->entityManager->flush();
+        return $plongeur;
     }
 }

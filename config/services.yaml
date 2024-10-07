@@ -26,3 +26,6 @@ services:
     App\EventListener\CommentaireListener:
         tags:
             - { name: doctrine.event_listener, event: prePersist }
+    App\EventListener\PlongeurListener:
+        tags:
+            - { name: doctrine.event_listener, event: preUpdate }

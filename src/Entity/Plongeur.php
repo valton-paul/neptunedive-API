@@ -407,4 +407,17 @@ class Plongeur implements UserInterface, PasswordAuthenticatedUserInterface
         // Exemple : Retourner le nom complet du plongeur
         return $this->getPrenom() . ' ' . $this->getNom();
     }
+
+    public function addRole($role) : void {
+        if(!in_array($role, $this->roles)) {
+            $this->roles[] = $role;
+        }
+    }
+
+    public function removeRole($role) : void {
+        $index = array_search($role, $this->roles);
+        if ($index !== false) {
+            unset($this->roles[$index]);
+        }
+    }
 }
