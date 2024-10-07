@@ -26,17 +26,17 @@ class BateauRepository extends ServiceEntityRepository
         return $query->getQuery()->getResult();
     }
 
-    public function findAvailableBoats(\DateTime $date, Creneaux $creneaux){
+    public function findAvailableBoats(\DateTime $date, Creneaux $creneaux) :array
+    {
         return $this->createQueryBuilder('b')
-            ->leftJoin('b.sortie', 's')
-            ->addSelect('s')
-            ->where('s.dateSortie IS NULL')
-            ->orWhere('s.dateSortie != :date OR s.creneau != :creneau')
+            ->leftJoin('App\Entity\Sortie', 's', 'WITH', 's.bateau = b')
+            ->where('s IS NULL OR (s.dateSortie != :date OR s.creneau != :creneau)')
             ->setParameter('date', $date)
             ->setParameter('creneau', $creneaux)
             ->getQuery()
             ->getResult();
     }
+
 
 
     //    /**

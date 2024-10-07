@@ -27,9 +27,18 @@ interface BateauManagerInterface
     function delete(Bateau $bateau): void;
 
     /**
+     * @param Bateau $bateau
+     * @param string|null $newImmatriculation
+     * @param int|null $newNbPlace
+     * @return Bateau
+     * @throws NotFoundException if the boats doesn't exist
+     * @throws NotAllowedException if the $newNbPlace is null or < 0
+     */
+    function update(Bateau $bateau, int $newNbPlace = null, string $newImmatriculation = null): Bateau;
+    /**
      * @param \DateTime $date
      * @param Creneaux $creneaux
-     * @return Collection
+     * @return array
      */
-    function areAvailable(\DateTime $date, Creneaux $creneaux): Collection;
+    function areAvailable(\DateTime $date, Creneaux $creneaux): array;
 }
