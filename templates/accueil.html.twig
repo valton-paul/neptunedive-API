@@ -4,8 +4,19 @@
 
 {% block body %}
     <main>
-        <form method="post" action="{{ path('_logout_main') }}">
-            <button>Déconnexion</button>
-        </form>
+
+        {% if sorties is defined %}
+            <h1>Les sorties à venir</h1>
+            <ul>
+                {% for sortie in sorties %}
+                    <li>
+                        <a href="{{ path('sortie', {'id': sortie.id}) }}">{{ sortie.type }}</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>Aucune sortie à venir</p>
+        {% endif %}
+
     </main>
 {% endblock %}

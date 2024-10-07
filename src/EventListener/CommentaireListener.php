@@ -21,7 +21,6 @@ class CommentaireListener
 
     public function prePersist(LifecycleEventArgs $event): void
     {
-
         $commentaire = $event->getObject();
 
         // Vérifiez si l'entité est un Commentaire

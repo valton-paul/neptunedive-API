@@ -4,6 +4,8 @@ namespace App\Service;
 
 use App\Entity\Plongeur;
 use App\Entity\Sortie;
+use App\Exception\AlreadyExistsException;
+use App\Exception\MemberNotFoundException;
 use App\Exception\NotAllowedException;
 use App\Service\SortieManagerInterface;
 use Doctrine\ORM\EntityManagerInterface;
@@ -23,6 +25,9 @@ class SortieManager implements SortieManagerInterface
      */
     function signUpFor(Plongeur $plongeur, Sortie $sortie): void
     {
+        if ($sortie->getInscriptions()->contains($plongeur)) {
+            throw new AlreadyExistsException();
+        }
         $sortie->addInscription($plongeur);
         $this->entityManager->persist($sortie);
         $this->entityManager->flush();
@@ -33,6 +38,12 @@ class SortieManager implements SortieManagerInterface
      */
     function quit(Plongeur $plongeur, Sortie $sortie): void
     {
+        if (!$sortie->getInscriptions()->contains($plongeur)) {
+            throw new MemberNotFoundException();
+        }
+        if ($sortie->getDirecteurPlongee() === $plongeur) {
+            throw new NotAllowedException("Vous ne pouvez pas vous désinscrire d'une sortie dont vous êtes le directeur de plongée");
+        }
         $sortie->removeInscription($plongeur);
         $this->entityManager->persist($sortie);
         $this->entityManager->flush();
@@ -47,16 +58,11 @@ class SortieManager implements SortieManagerInterface
         if (!$this->security->isGranted('ROLE_MONITEUR')) {
             throw new NotAllowedException("Vous n'êtes pas autorisé à créer une sortie");
         }
-        if ($form->get('dateSortie')->getData() < new \DateTime()) {
-            throw new \DateException();
+        $this->UpdateSortie($form, $sortie, $this->security->getUser());
+        $plongeur = $this->security->getUser();
+        if ($plongeur instanceof Plongeur) {
+            $sortie->addInscription($plongeur);
         }
-        $sortie->setDateSortie($form->get('dateSortie')->getData());
-        $sortie->setLieu($form->get('lieu')->getData());
-        $sortie->setType($form->get('type')->getData());
-        $sortie->setCreneau($form->get('creneau')->getData());
-        $sortie->setDirecteurPlongee($this->security->getUser());
-        $sortie->setSecuriteSurface($form->get('securiteSurface')->getData());
-        $sortie->setPiloteBateau($form->get('piloteBateau')->getData());
         $this->entityManager->persist($sortie);
         $this->entityManager->flush();
     }
@@ -69,25 +75,8 @@ class SortieManager implements SortieManagerInterface
         if (!$this->security->isGranted('ROLE_MONITEUR')) {
             throw new NotAllowedException("Vous n'êtes pas autorisé à éditer une sortie");
         }
-        $date = new \DateTime($form->get('date')->getData());
-        if ($date < new \DateTime()) {
-            throw new \DateException();
-        }
-        $sortie->setDateSortie($date);
-        $sortie->setLieu($form->get('lieu')->getData());
-        $sortie->setType($form->get('type')->getData());
-        $sortie->setCreneau($form->get('creneau')->getData());
-        $sortie->setDirecteurPlongee($this->security->getUser());
-        $sortie->setSecuriteSurface($form->get('securiteSurface')->getData());
-        $sortie->setBateau($form->get('bateau')->getData());
-        $sortie->setPiloteBateau($form->get('piloteBateau')->getData());
-        $newInscriptions = $form->get('inscriptions')->getData();
-        $currentInscriptions = $sortie->getInscriptions()->toArray();
-        foreach ($currentInscriptions as $plongeur) {
-            if (!in_array($plongeur, $newInscriptions, true)) {
-                $sortie->removeInscription($plongeur);
-            }
-        }
+        $this->UpdateSortie($form, $sortie, $form->get('directeurPlongee')->getData());
+        dump($sortie->getInscriptions());
         $this->entityManager->persist($sortie);
         $this->entityManager->flush();
     }
@@ -102,6 +91,28 @@ class SortieManager implements SortieManagerInterface
         }
         $this->entityManager->remove($sortie);
         $this->entityManager->flush();
+    }
+
+    /**
+     * @param FormInterface $form
+     * @param Sortie $sortie
+     * @return void
+     * @throws \DateException
+     */
+    private function UpdateSortie(FormInterface $form, Sortie $sortie, $directeurPlongee): void
+    {
+        $date = $form->get('dateSortie')->getData();
+        if ($date < new \DateTime()) {
+            throw new \DateException();
+        }
+        $sortie->setDateSortie($date);
+        $sortie->setLieu($form->get('lieu')->getData());
+        $sortie->setType($form->get('type')->getData());
+        $sortie->setCreneau($form->get('creneau')->getData());
+        $sortie->setDirecteurPlongee($directeurPlongee);
+        $sortie->setSecuriteSurface($form->get('securiteSurface')->getData());
+        $sortie->setPiloteBateau($form->get('piloteBateau')->getData());
+        /*$sortie->setBateau($form->get('bateau')->getData());*/
     }
 
 

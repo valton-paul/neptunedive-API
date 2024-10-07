@@ -11,7 +11,36 @@
             {% block importmap %}{{ importmap('app') }}{% endblock %}
         {% endblock %}
     </head>
+    <header>
+        <nav style="display: flex;gap: .5rem;">
+
+            {% if app.user %}
+                <form method="post" action="{{ path('_logout_main') }}">
+                    <button>Déconnexion</button>
+                </form>
+            {% else %}
+                <form method="get" action="{{ path('connexion') }}">
+                    <button>Connexion</button>
+                </form>
+                <form method="get" action="{{ path('inscription') }}">
+                    <button>Inscription</button>
+                </form>
+            {% endif %}
+        </nav>
+
+        {% for message in app.session.flashBag.get('success') %}
+            <div class="alert alert-success">{{ message }}</div>
+        {% endfor %}
+
+        {% for message in app.session.flashBag.get('error') %}
+            <div class="alert alert-danger">{{ message }}</div>
+        {% endfor %}
+        {% for message in app.session.flashBag.get('warning') %}
+            <div class="alert alert-warning">{{ message }}</div>
+        {% endfor %}
+    </header>
     <body>
+
         {% block body %}{% endblock %}
     </body>
 </html>

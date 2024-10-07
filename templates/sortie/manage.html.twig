@@ -6,55 +6,108 @@
 {% block body %}
     <h1>Modifier la Sortie</h1>
 
-    {% for message in app.session.flashBag.get('warning') %}
-        <div class="alert alert-warning">{{ message }}</div>
-    {% endfor %}
+    {% if is_granted('ROLE_USER') %}
+        {% if not isInscrit %}
+        <button class="btn btn-primary" onclick="window.location.href='{{ path('signUpToSortie', {'id': sortie.id}) }}'">
+            S'inscrire
+        </button>
+        {% else %}
+        <button class="btn btn-danger" onclick="window.location.href='{{ path('quitSortie', {'id': sortie.id, 'idPlongeur': app.user.id}) }}'">
+            Se désinscrire
+        </button>
+        {% endif %}
+    {% endif %}
 
-    {{ form_start(form) }}
-    <div class="form-group">
-        {{ form_label(form.type) }}
-        {{ form_widget(form.type, { 'attr': { 'class': 'form-control' } }) }}
-        {{ form_errors(form.type) }}
-    </div>
 
-    <div class="form-group">
-        {{ form_label(form.dateSortie) }}
-        {{ form_widget(form.dateSortie, { 'attr': { 'class': 'form-control' } }) }}
-        {{ form_errors(form.dateSortie) }}
-    </div>
+    {% if is_granted('ROLE_MONITEUR') %}
 
-    <div class="form-group">
-        {{ form_label(form.lieu) }}
-        {{ form_widget(form.lieu, { 'attr': { 'class': 'form-control' } }) }}
-        {{ form_errors(form.lieu) }}
-    </div>
+        <button class="btn btn-danger" onclick="window.location.href='{{ path('cancelSortie', {'id': sortie.id}) }}'">
+            Annuler la sortie
+        </button>
+        <div style="display: flex; gap: 2em;">
+            <div>
+                {{ form_start(form) }}
+                <div class="form-group">
+                    {{ form_label(form.type) }}
+                    {{ form_widget(form.type, { 'attr': { 'class': 'form-control' } }) }}
+                    {{ form_errors(form.type) }}
+                </div>
 
-    <div class="form-group">
-        {{ form_label(form.inscriptions) }}
-        {{ form_widget(form.inscriptions, { 'attr': { 'class': 'form-control' } }) }}
-        {{ form_errors(form.inscriptions) }}
-    </div>
+                <div class="form-group">
+                    {{ form_label(form.dateSortie) }}
+                    {{ form_widget(form.dateSortie, { 'attr': { 'class': 'form-control' } }) }}
+                    {{ form_errors(form.dateSortie) }}
+                </div>
 
-    <div class="form-group">
-        {{ form_label(form.creneau) }}
-        {{ form_widget(form.creneau, { 'attr': { 'class': 'form-control' } }) }}
-        {{ form_errors(form.creneau) }}
-    </div>
+                <div class="form-group">
+                    {{ form_label(form.lieu) }}
+                    {{ form_widget(form.lieu, { 'attr': { 'class': 'form-control' } }) }}
+                    {{ form_errors(form.lieu) }}
+                </div>
 
-    <div class="form-group">
-        {{ form_label(form.bateau) }}
-        {{ form_widget(form.bateau, { 'attr': { 'class': 'form-control' } }) }}
-        {{ form_errors(form.bateau) }}
-    </div>
+                <div class="form-group">
+                    {{ form_label(form.directeurPlongee) }}
+                    {{ form_widget(form.directeurPlongee, { 'attr': { 'class': 'form-control' } }) }}
+                    {{ form_errors(form.directeurPlongee) }}
+                </div>
 
-    <div class="form-group">
-        {{ form_label(form.piloteBateau) }}
-        {{ form_widget(form.piloteBateau, { 'attr': { 'class': 'form-control' } }) }}
-        {{ form_errors(form.piloteBateau) }}
-    </div>
+                <div class="form-group">
+                    {{ form_label(form.creneau) }}
+                    {{ form_widget(form.creneau, { 'attr': { 'class': 'form-control' } }) }}
+                    {{ form_errors(form.creneau) }}
+                </div>
 
-    <button class="btn btn-primary">Sauvegarder les modifications</button>
-    {{ form_end(form) }}
+                {#<div class="form-group">
+                    {{ form_label(form.bateau) }}
+                    {{ form_widget(form.bateau, { 'attr': { 'class': 'form-control' } }) }}
+                    {{ form_errors(form.bateau) }}
+                </div>
+            #}
+                <div class="form-group">
+                    {{ form_label(form.piloteBateau) }}
+                    {{ form_widget(form.piloteBateau, { 'attr': { 'class': 'form-control' } }) }}
+                    {{ form_errors(form.piloteBateau) }}
+                </div>
 
-    <a href="{{ path('sortie_list') }}" class="btn btn-secondary">Retour à la liste des sorties</a>
+                <div class="form-group">
+                    {{ form_label(form.securiteSurface) }}
+                    {{ form_widget(form.securiteSurface, { 'attr': { 'class': 'form-control' } }) }}
+                    {{ form_errors(form.securiteSurface) }}
+                </div>
+
+                <button class="btn btn-primary">Sauvegarder les modifications</button>
+
+                {{ form_end(form) }}
+            </div>
+            <div>
+                {% for plongeur in sortie.inscriptions %}
+                    {% if plongeur.isMoniteur %}
+                        <span>{{ plongeur.prenom }} {{ plongeur.nom }} (Moniteur)</span>
+                    {% else %}
+                        <span>{{ plongeur.prenom }} {{ plongeur.nom }}</span>
+                    {% endif %}
+                    <button class="btn btn-danger" onclick="window.location.href='{{ path('quitSortie', {'id': sortie.id, 'idPlongeur': plongeur.id}) }}'">
+                        Supprimer
+                    </button>
+                {% endfor %}
+            </div>
+        </div>
+    {% else %}
+        <div class="form-group">
+            <p>Type de sortie : {{ sortie.type }}</p>
+        </div>
+
+        <div class="form-group">
+            <p>Date de la sortie : {{ sortie.dateSortie|date('d/m/Y') }}</p>
+        </div>
+
+        <div class="form-group">
+            <p>Lieu de la sortie : {{ sortie.lieu }}</p>
+        </div>
+
+        <div class="form-group">
+            <p>Créneau : {{ sortie.creneau.label }}</p>
+        </div>
+    {% endif %}
+
 {% endblock %}

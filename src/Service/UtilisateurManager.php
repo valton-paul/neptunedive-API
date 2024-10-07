@@ -41,6 +41,8 @@ class UtilisateurManager implements UtilisateurManagerInterface
     {
         $this->checkIfEmailExistsAlready($plongeur);
         $this->chiffrerMotDePasse($plongeur, $plainPassword);
+        $plongeur->setNiveauMoniteur(NiveauMoniteur::NONE);
+        $plongeur->setMoniteur(false);
     }
 
     /**

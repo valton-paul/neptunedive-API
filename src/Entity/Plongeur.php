@@ -401,4 +401,10 @@ class Plongeur implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+
+    public function __toString(): string
+    {
+        // Exemple : Retourner le nom complet du plongeur
+        return $this->getPrenom() . ' ' . $this->getNom();
+    }
 }
