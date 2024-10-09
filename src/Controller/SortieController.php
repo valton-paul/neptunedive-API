@@ -9,6 +9,7 @@ use App\Exception\MemberNotFoundException;
 use App\Exception\NotAllowedException;
 use App\Form\Sortie\SortieCreateType;
 use App\Form\Sortie\SortieEditType;
+use App\Service\BateauManagerInterface;
 use App\Service\SortieManagerInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -119,14 +120,32 @@ class SortieController extends AbstractController
     #[Route('/sortie/{id}', name: 'sortie', methods: ['GET','POST'])]
     public function edit(?Sortie $sortie,
                          SortieManagerInterface $sortieManager,
-                         Request $request): Response
+                         Request $request,
+                         BateauManagerInterface $bateauManager): Response
     {
         if ($sortie == null) {
             $this->addFlash('error', 'Sortie inconnue');
             return $this->redirectToRoute('accueil');
         }
-        $form = $this->createForm(SortieEditType::class, $sortie, ['method' => 'POST',
-            'action' => $this->generateURL('sortie', ['id' => $sortie->getId()]), 'sortie' => $sortie]);
+        $availableBoats = $bateauManager->areAvailable($sortie->getDateSortie(), $sortie->getCreneau());
+        if ($sortie->getBateau()) {
+            $currentBoat = $sortie->getBateau();
+            $boats = [$currentBoat];
+            foreach ($availableBoats as $boat) {
+                if ($boat !== $currentBoat) {
+                    $boats[] = $boat;
+                }
+            }
+        } else {
+            $boats = $availableBoats;
+        }
+        $form = $this->createForm(SortieEditType::class, $sortie,
+            [
+                'method' => 'POST',
+                'action' => $this->generateURL('sortie', ['id' => $sortie->getId()]),
+                'sortie' => $sortie,
+                'boats' => $boats
+            ]);
         $form->handleRequest($request);
         if($form->isSubmitted() && $form->isValid()) {
             try {

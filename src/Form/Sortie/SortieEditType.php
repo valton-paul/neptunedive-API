@@ -28,6 +28,7 @@ class SortieEditType extends AbstractType
         $sortie = $options['sortie'];
 
         $availableBoats = $this->bateauManager->areAvailable($sortie->getDateSortie(), $sortie->getCreneau());
+
         $builder
             ->add('type')
             ->add('dateSortie', null, [
@@ -60,9 +61,12 @@ class SortieEditType extends AbstractType
                 'choice_label' => function (Bateau $bateau) {
                     return $bateau->getImmatriculation() . ' (' . $bateau->getNbPlaces() . ' places)';
                 },
-                'choices' => $availableBoats,
-
+                'choices' => $options['boats'],  // Liste des bateaux triée passée dans les options
+                'placeholder' => 'Pas de bateau',  // Option vide si aucun bateau n'est assigné
+                'required' => false, // Permet de laisser le choix vide
             ])
+
+
             ->add('piloteBateau', EntityType::class, [
                 'class' => Plongeur::class,
                 'choice_label' => function (Plongeur $moniteur) {
@@ -100,6 +104,7 @@ class SortieEditType extends AbstractType
         $resolver->setDefaults([
             'data_class' => Sortie::class,
         ]);
-        $resolver->setDefined(['sortie']);
+        $resolver->setDefined(['sortie', 'boats']);
+
     }
 }
