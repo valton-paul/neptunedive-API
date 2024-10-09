@@ -15,6 +15,11 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class SortieCreateType extends AbstractType
 {
+
+    public function __construct()
+    {
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
@@ -41,10 +46,13 @@ class SortieCreateType extends AbstractType
                         ->setParameter('moniteur', 1);
                 },
             ])
-            /*->add('bateau', EntityType::class, [
+            ->add('bateau', EntityType::class, [
                 'class' => Bateau::class,
-                'choice_label' => 'immatriculation',
-            ])*/
+                'choice_label' => function (Bateau $bateau) {
+                    return $bateau->getImmatriculation() . ' (' . $bateau->getNbPlaces() . ' places)';
+                },
+
+            ])
             ->add('piloteBateau', EntityType::class, [
                 'class' => Plongeur::class,
                 'choice_label' => function (Plongeur $moniteur) {
