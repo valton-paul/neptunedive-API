@@ -43,9 +43,9 @@ class BateauManager implements BateauManagerInterface
 
     function update(Bateau $bateau, int $newNbPlace = null, string $newImmatriculation = null): Bateau
     {
-        try{
-            $bateauExistant = $this->entityManager->getRepository(Bateau::class)->find($bateau->getId());
-        }catch (\Exception $e){
+        $bateauExistant = $this->entityManager->getRepository(Bateau::class)->find($bateau->getId());
+
+        if(!$bateauExistant){
             throw new NotFoundException('Boat not found');
         }
 

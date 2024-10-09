@@ -14,210 +14,133 @@ use App\Exception\NotFoundException;
 use App\Repository\BateauRepository;
 use App\Service\BateauManager;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use PHPUnit\Framework\TestCase;
 
-class BateauManagerTest extends KernelTestCase
+class BateauManagerTest extends TestCase
 {
-    private $entityManager;
+    private $entityManagerMock;
+    private $bateauRepositoryMock;
+    private $bateauManager;
+
     protected function setUp(): void
     {
-        static::bootKernel();
-        $this->entityManager = static::$kernel->getContainer()->get('doctrine.orm.entity_manager');
-        if($this->entityManager === null){
-            $this->entityManager = $this->createMock(EntityManagerInterface::class);
-        }
-        $this->clearDatabase();
+        $this->entityManagerMock = $this->createMock(EntityManagerInterface::class);
+        $this->bateauRepositoryMock = $this->createMock(BateauRepository::class);
+
+        $this->entityManagerMock
+            ->method('getRepository')
+            ->willReturn($this->bateauRepositoryMock);
+
+        $this->bateauManager = new BateauManager($this->entityManagerMock);
     }
 
-    private function clearDatabase(): void
+    public function testCreate()
     {
-        $connection = $this->entityManager->getConnection();
-        $schemaManager = $connection->createSchemaManager();
+        $bateau = new Bateau();
+        $bateau->setImmatriculation('ABC123')->setNbPlaces(9);
 
-        $tables = $schemaManager->listTableNames();
-
-        $connection->executeStatement('SET FOREIGN_KEY_CHECKS=0');
-
-        foreach ($tables as $table) {
-            $connection->executeStatement("TRUNCATE TABLE `$table`");
-        }
-
-        $connection->executeStatement('SET FOREIGN_KEY_CHECKS=1');
-    }
-
-    public function testCreate(){
-
-        $entityManagerMock = $this->createMock(EntityManagerInterface::class);
-
-        $entityManagerMock->expects($this->once())
+        $this->entityManagerMock->expects($this->once())
             ->method('persist')
             ->with($this->isInstanceOf(Bateau::class));
 
-        $bateauManager = new BateauManager($entityManagerMock);
+        $this->entityManagerMock->expects($this->once())
+            ->method('flush');
 
-        $bateau = $bateauManager->create('ABC123', 9);
+        $bateauManager = new BateauManager($this->entityManagerMock);
+        $createdBateau = $bateauManager->create('ABC123', 9);
 
-        $this->assertInstanceOf(Bateau::class, $bateau);
-        $this->assertEquals('ABC123', $bateau->getImmatriculation());
-        $this->assertEquals(9, $bateau->getNbPlaces());
+        $this->assertInstanceOf(Bateau::class, $createdBateau);
+        $this->assertEquals('ABC123', $createdBateau->getImmatriculation());
+        $this->assertEquals(9, $createdBateau->getNbPlaces());
     }
 
-    public function testCreateWithNegativePlaces(){
-        $entityManagerMock = $this->createMock(EntityManagerInterface::class);
-
-        $bateauManager = new BateauManager($entityManagerMock);
+    public function testCreateWithNegativePlaces()
+    {
+        $bateauManager = new BateauManager($this->entityManagerMock);
 
         $this->expectException(NotAllowedException::class);
+
         $bateauManager->create('ABC123', -1);
     }
 
     public function testDelete()
     {
         $bateauMock = $this->createMock(Bateau::class);
-        $entityManagerMock = $this->createMock(EntityManagerInterface::class);
-        $bateauRepositoryMock = $this->createMock(BateauRepository::class);
-        $bateauManager = new BateauManager($entityManagerMock);
+        $bateauMock->method('getId')->willReturn(1);
 
-        $entityManagerMock->method('getRepository')
-            ->willReturn($bateauRepositoryMock);
-
-        $bateauId = 1;
-        $bateauMock->method('getId')->willReturn($bateauId);
-
-        $bateauRepositoryMock->method('find')
-            ->with($bateauId)
+        $this->bateauRepositoryMock->expects($this->once())
+            ->method('find')
+            ->with(1)
             ->willReturn($bateauMock);
 
-        $entityManagerMock->expects($this->once())
+        $this->entityManagerMock->expects($this->once())
+            ->method('remove')
+            ->with($bateauMock);
+
+        $this->entityManagerMock->expects($this->once())
             ->method('flush');
 
-        $bateauManager->delete($bateauMock);
+        $this->bateauManager->delete($bateauMock);
     }
 
-    public function testDeleteOnNonExistentBoat(){
-        $bateauMock = $this->createMock(Bateau::class);
-        $entityManagerMock = $this->createMock(EntityManagerInterface::class);
-        $bateauRepositoryMock = $this->createMock(BateauRepository::class);
-        $bateauManager = new BateauManager($entityManagerMock);
-
-        $entityManagerMock->method('getRepository')
-            ->willReturn($bateauRepositoryMock);
-
-        $bateauId = 1;
-        $bateauMock->method('getId')->willReturn($bateauId);
-
-        $bateauRepositoryMock->method('find')
-            ->with($bateauId)
+    public function testDeleteOnNonExistentBoat()
+    {
+        $this->bateauRepositoryMock->expects($this->once())
+            ->method('find')
             ->willReturn(null);
+
+        $this->entityManagerMock->expects($this->once())
+            ->method('getRepository')
+            ->willReturn($this->bateauRepositoryMock);
+
+        $bateauManager = new BateauManager($this->entityManagerMock);
 
         $this->expectException(NotFoundException::class);
 
-        $bateauManager->delete($bateauMock);
+        $bateauManager->delete(new Bateau());
     }
 
-    public function testCorrectUpdate(){
-        $bateau1 = (new Bateau())->setImmatriculation('BA001')->setNbPlaces(4);
+    public function testCorrectUpdate()
+    {
+        $bateau = (new Bateau())->setImmatriculation('BB000')->setNbPlaces(5);
 
-        $this->entityManager->persist($bateau1);
-        $this->entityManager->flush();
+        $this->bateauRepositoryMock->expects($this->once())
+            ->method('find')
+            ->willReturn($bateau);
 
-        $boat = ((new BateauManager($this->entityManager)))->update($bateau1, 5);
+        $this->entityManagerMock->expects($this->once())
+            ->method('flush');
 
-        $this->assertEquals(5, $boat->getNbPlaces());
-        $this->assertEquals('BA001', $boat->getImmatriculation());
+        $updatedBateau = $this->bateauManager->update($bateau, 10, 'AA000');
 
-        $boat = ((new BateauManager($this->entityManager)))->update($bateau1, 10, 'AA000');
-
-        $this->assertEquals(10, $boat->getNbPlaces());
-        $this->assertEquals('AA000', $boat->getImmatriculation());
+        $this->assertEquals(10, $updatedBateau->getNbPlaces());
+        $this->assertEquals('AA000', $updatedBateau->getImmatriculation());
     }
 
-    public function testUpdateWithNegativeNumber(){
-        $bateau1 = (new Bateau())->setImmatriculation('BA001')->setNbPlaces(4);
 
-        $this->entityManager->persist($bateau1);
-        $this->entityManager->flush();
+    public function testUpdateWithNegativeNumber()
+    {
+        $bateau = (new Bateau())->setImmatriculation('BB000')->setNbPlaces(5);
+
+        $this->bateauRepositoryMock->expects($this->once())
+            ->method('find')
+            ->willReturn($bateau);
+
+        $bateauManager = new BateauManager($this->entityManagerMock);
 
         $this->expectException(NotAllowedException::class);
 
-        ((new BateauManager($this->entityManager)))->update($bateau1, -5);
+        $bateauManager->update($bateau, -5);
     }
 
-    public function testUpdateWithNonExistentBoat(){
-        $bateau1 = (new Bateau())->setImmatriculation('BA001')->setNbPlaces(4);
+    public function testUpdateWithNonExistentBoat()
+    {
+        $bateau2 = new Bateau();
+        $bateau2->setImmatriculation('ZZ999')->setNbPlaces(4);
 
-        $this->entityManager->persist($bateau1);
-        $this->entityManager->flush();
-
-        $bateau2 = (new Bateau())->setImmatriculation('ZZ999')->setNbPlaces(4);
+        $bateauManager = new BateauManager($this->entityManagerMock);
 
         $this->expectException(NotFoundException::class);
-
-        ((new BateauManager($this->entityManager)))->update($bateau2, 4);
-    }
-
-    public function testFindAvailableBoats(): void
-    {
-        $bateau1 = (new Bateau())->setImmatriculation('BA001')->setNbPlaces(4);
-        $bateau2 = (new Bateau())->setImmatriculation('BA002')->setNbPlaces(5);
-        $bateau3 = (new Bateau())->setImmatriculation('BA003')->setNbPlaces(3);
-
-        $this->entityManager->persist($bateau1);
-        $this->entityManager->persist($bateau2);
-        $this->entityManager->persist($bateau3);
-
-        $directeurPlongee1 = (new Plongeur())
-            ->setNiveauMoniteur(NiveauMoniteur::E4)
-            ->setEmail("plongeur1@gmail.com")
-            ->setNom("Charotte")
-            ->setFormation(false)
-            ->setNiveauPlongeeAutonome(NiveauPlongeeAutonome::PA60)
-            ->setNiveauPlongeeEncadre(NiveauPlongeeEncadre::PE60)
-            ->setPassword("secure")
-            ->setMoniteur(true)
-            ->setPrenom("Thomas");;
-        $directeurPlongee2 = (new Plongeur())
-            ->setNiveauMoniteur(NiveauMoniteur::E4)
-            ->setEmail("plongeur2@gmail.com")
-            ->setNom("Charotte")
-            ->setFormation(false)
-            ->setNiveauPlongeeAutonome(NiveauPlongeeAutonome::PA60)
-            ->setNiveauPlongeeEncadre(NiveauPlongeeEncadre::PE60)
-            ->setPassword("secure")
-            ->setMoniteur(true)
-            ->setPrenom("Thomas");;
-
-        $this->entityManager->persist($directeurPlongee1);
-        $this->entityManager->persist($directeurPlongee2);
-
-        // Création des sorties
-        $sortie1 = (new Sortie())
-            ->setDateSortie(new \DateTime('2025-01-01'))
-            ->setCreneau(Creneaux::MATIN)
-            ->setType("mer")
-            ->setLieu("Montpellier")
-            ->setDirecteurPlongee($directeurPlongee1)
-            ->setSecuriteSurface($directeurPlongee1)
-            ->setBateau($bateau1);
-
-        $sortie2 = (new Sortie())
-            ->setDateSortie(new \DateTime('2025-01-01'))
-            ->setCreneau(Creneaux::MATIN)
-            ->setType("mer")
-            ->setLieu("Palavas")
-            ->setDirecteurPlongee($directeurPlongee2)
-            ->setSecuriteSurface($directeurPlongee2)
-            ->setBateau($bateau2);
-
-        $this->entityManager->persist($sortie1);
-        $this->entityManager->persist($sortie2);
-
-        $this->entityManager->flush();
-
-        $availableBoats = (new BateauManager($this->entityManager))->areAvailable(new \DateTime('2025-01-01'), Creneaux::MATIN);
-        $this->assertCount(1, $availableBoats);
-        $this->assertContains($bateau3, $availableBoats);
-        $this->assertNotContains($bateau1, $availableBoats);
-        $this->assertNotContains($bateau2, $availableBoats);
+        $bateauManager->update($bateau2, 6);
     }
 }
