@@ -18,4 +18,5 @@ interface UtilisateurManagerInterface
      * @throws AlreadyExistsException If $plongeur is already a supervisor
      */
     function makeSupervisor(Plongeur $plongeur, NiveauMoniteur $niveauMoniteur): Plongeur;
+    function revokeSupervisor(Plongeur $plongeur): Plongeur;
 }

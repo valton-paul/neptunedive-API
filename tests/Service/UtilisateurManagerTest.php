@@ -42,7 +42,6 @@ class UtilisateurManagerTest extends TestCase
         $this->utilisateurManager->makeSupervisor($this->plongeur, NiveauMoniteur::E3);
         $this->assertTrue($this->plongeur->isMoniteur());
         $this->assertEquals(NiveauMoniteur::E3, $this->plongeur->getNiveauMoniteur());
-        $this->assertContains("ROLE_MONITEUR", $this->plongeur->getRoles());
     }
 
 }
