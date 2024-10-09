@@ -1,0 +1,43 @@
+version: '3'
+
+services:
+
+  db:
+    image: mysql:8.0
+    container_name: neptunedive-bd
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./docker/database/data:/var/lib/mysql
+    networks:
+      - network
+    environment:
+      MYSQL_DATABASE: 'neptunedive'
+      MYSQL_ROOT_PASSWORD: 'root'
+
+  app:
+    build:
+      context: .
+      dockerfile: ./docker/dockerfile
+    container_name: neptunedive-app
+    ports:
+      - "8000:80"
+    networks:
+      - network
+    environment:
+      - APP_ENV=dev
+      - DATABASE_URL=mysql://root:root@db:3306/neptunedive
+    depends_on:
+      - db
+    command: >
+      sh -c "echo 'Waiting for database...'; 
+      sleep 10;
+      php bin/console doctrine:migrations:migrate --no-interaction;
+      apache2-foreground"
+
+
+
+
+networks:
+  network:
+    driver: bridge
