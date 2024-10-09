@@ -30,7 +30,7 @@ interface PalanqueeManagerInterface
      * @param Palanquee $palanquee
      * @return void
      * @throws MemberNotFoundException If $moniteur is not enrolled for the event
-     * @throws NotAllowedException If $moniteur doesn't have the required level (level of each diver)
+     * @throws NotAllowedException If $moniteur is not a moniteur
      */
     function assignAsSupervisor(Plongeur $moniteur, Palanquee $palanquee): void;
 
@@ -39,7 +39,6 @@ interface PalanqueeManagerInterface
      * @param Palanquee $palanquee
      * @return void
      * @throws MemberNotFoundException If $plongeur is not enrolled for the event
-     * @throws NotAllowedException If $plongeur has a higher level than the current supervisor
      */
     function assignAsDiver(Plongeur $plongeur, Palanquee $palanquee): void;
 
