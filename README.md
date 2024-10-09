@@ -26,7 +26,8 @@ Via HTTPS
 git clone https://gitlabinfo.iutmontp.univ-montp2.fr/dream_team/neptunedive.git
 ```
 
-Une fois cela fait, démarrez Docker, soit via Docker Desktop, soit en exécutant la commande suivante :
+Une fois cela fait, démarrez Docker via Docker Desktop. 
+Si vous utilisez Docker Engine, démarrez Docker en exécutant la commande suivante :
 
 ```bash
 sudo systemctl start docker
