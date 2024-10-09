@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
     <head>
         <meta charset="UTF-8">
         <title>{% block title %}Welcome!{% endblock %}</title>
@@ -13,7 +13,7 @@
     </head>
     <header>
         <nav style="display: flex;gap: .5rem;">
-
+            <a href="{{ path("accueil") }}">Accueil</a>
             {% if app.user %}
                 <form method="post" action="{{ path('_logout_main') }}">
                     <button>Déconnexion</button>

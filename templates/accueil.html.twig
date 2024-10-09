@@ -12,7 +12,7 @@
             <ul>
                 {% for sortie in sorties %}
                     <li>
-                        <a href="{{ path('sortie', {'id': sortie.id}) }}">{{ sortie.type }}</a>
+                        <a href="{{ path('sortie', {'id': sortie.id}) }}">Sortie du type {{ sortie.type }} à {{ sortie.lieu }} le {{ sortie.dateSortie|date('d/m/Y') }} sur le crenaux : {{ sortie.creneau.value }}</a>
                     </li>
                 {% endfor %}
             </ul>
