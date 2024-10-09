@@ -11,6 +11,7 @@ use App\Repository\PlongeurRepository;
 use App\Service\PalanqueeManagerInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -26,14 +27,11 @@ class PalanqueeController extends AbstractController
 
     }
 
-    #[IsGranted("ROLE_MONITEUR")]
+    #[IsGranted(attribute: new Expression("is_granted('ROLE_MONITEUR') && subject.getDirecteurPlongee().getId() == user.getId()"),
+        subject: "sortie")]
     #[Route('/sortie/{id}/createPalanquee', name: 'createPalanquee', methods: ['GET'])]
-    public function createPalanquee(?Sortie $sortie): Response
+    public function createPalanquee(Sortie $sortie): Response
     {
-        if ($sortie == null){
-            $this->addFlash('error', 'La sortie n\'existe pas');
-            return $this->redirectToRoute('accueil');
-        }
         try {
             $this->palanqueeManager->create($sortie);
         }catch (NotAllowedException $e){
@@ -42,14 +40,11 @@ class PalanqueeController extends AbstractController
         return $this->redirectToRoute('sortie', ['id' => $sortie->getId()]);
     }
 
-    #[IsGranted("ROLE_MONITEUR")]
+    #[IsGranted(attribute: new Expression("is_granted('ROLE_MONITEUR') && subject.getSortie().getDirecteurPlongee().getId() == user.getId()"),
+        subject: "palanquee")]
     #[Route('/sortie/removePalanquee/{id}', name: 'removePalanquee', methods: ['GET'])]
-    public function removePalanquee(?Palanquee $palanquee): Response
+    public function removePalanquee(Palanquee $palanquee): Response
     {
-        if ($palanquee == null){
-            $this->addFlash('error', 'La palanquee n\'existe pas');
-            return $this->redirectToRoute('accueil');
-        }
         $sortie = $palanquee->getSortie();
         try {
             $this->palanqueeManager->remove($palanquee);
@@ -59,14 +54,11 @@ class PalanqueeController extends AbstractController
         return $this->redirectToRoute('sortie', ['id' => $sortie->getId()]);
     }
 
-    #[IsGranted("ROLE_MONITEUR")]
+    #[IsGranted(attribute: new Expression("is_granted('ROLE_MONITEUR') && subject.getSortie().getDirecteurPlongee().getId() == user.getId()"),
+        subject: "palanquee")]
     #[Route('/sortie/palanquee/{id}/assignSupervisor/{idMoniteur}', name: 'assignAsSupervisor', methods: ['GET'])]
-    public function assignAsSupervisor(?Palanquee $palanquee, $idMoniteur) : Response
+    public function assignAsSupervisor(Palanquee $palanquee, $idMoniteur) : Response
     {
-        if ($palanquee == null){
-            $this->addFlash('error', 'La palanquee n\'existe pas');
-            return $this->redirectToRoute('accueil');
-        }
         $moniteur = $this->entityManager->getRepository(Plongeur::class)->find($idMoniteur);
         $sortie = $palanquee->getSortie();
         if ($moniteur == null){
@@ -84,14 +76,11 @@ class PalanqueeController extends AbstractController
         return $this->redirectToRoute('sortie', ['id' => $sortie->getId()]);
     }
 
-    #[IsGranted("ROLE_MONITEUR")]
+    #[IsGranted(attribute: new Expression("is_granted('ROLE_MONITEUR') && subject.getSortie().getDirecteurPlongee().getId() == user.getId()"),
+        subject: "palanquee")]
     #[Route('/sortie/palanquee/{id}/assign/{idPlongeur}', name: 'assignAsDiver', methods: ['GET'])]
-    public function assignAsDiver(?Palanquee $palanquee, $idPlongeur) : Response
+    public function assignAsDiver(Palanquee $palanquee, $idPlongeur) : Response
     {
-        if ($palanquee == null){
-            $this->addFlash('error', 'La palanquee n\'existe pas');
-            return $this->redirectToRoute('accueil');
-        }
         $plongeur = $this->entityManager->getRepository(Plongeur::class)->find($idPlongeur);
         $sortie = $palanquee->getSortie();
         if ($plongeur == null){
@@ -106,14 +95,11 @@ class PalanqueeController extends AbstractController
         return $this->redirectToRoute('sortie', ['id' => $sortie->getId()]);
     }
 
-    #[IsGranted("ROLE_MONITEUR")]
+    #[IsGranted(attribute: new Expression("is_granted('ROLE_MONITEUR') && subject.getSortie().getDirecteurPlongee().getId() == user.getId()"),
+        subject: "palanquee")]
     #[Route('/sortie/palanquee/{id}/kickSupervisor', name: 'kickSupervisor', methods: ['GET'])]
-    public function kickSupervisor(?Palanquee $palanquee): Response
+    public function kickSupervisor(Palanquee $palanquee): Response
     {
-        if ($palanquee == null){
-            $this->addFlash('error', 'La palanquee n\'existe pas');
-            return $this->redirectToRoute('accueil');
-        }
         $sortie = $palanquee->getSortie();
         try {
             $this->palanqueeManager->kickCurrentSupervisor($palanquee);
@@ -123,14 +109,11 @@ class PalanqueeController extends AbstractController
         return $this->redirectToRoute('sortie', ['id' => $sortie->getId()]);
     }
 
-    #[IsGranted("ROLE_MONITEUR")]
+    #[IsGranted(attribute: new Expression("is_granted('ROLE_MONITEUR') && subject.getSortie().getDirecteurPlongee().getId() == user.getId()"),
+        subject: "palanquee")]
     #[Route('/sortie/palanquee/{id}/kick/{idPlongeur}', name: 'kickDiver', methods: ['GET'])]
-    public function kickDiver(?Palanquee $palanquee, $idPlongeur): Response
+    public function kickDiver(Palanquee $palanquee, $idPlongeur): Response
     {
-        if ($palanquee == null){
-            $this->addFlash('error', 'La palanquee n\'existe pas');
-            return $this->redirectToRoute('accueil');
-        }
         $plongeur = $this->entityManager->getRepository(Plongeur::class)->find($idPlongeur);
         $sortie = $palanquee->getSortie();
         try {
