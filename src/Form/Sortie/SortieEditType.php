@@ -7,6 +7,7 @@ use App\Entity\Plongeur;
 use App\Entity\Sortie;
 use App\Enum\Creneaux;
 use App\Repository\PlongeurRepository;
+use App\Service\BateauManagerInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -15,10 +16,18 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class SortieEditType extends AbstractType
 {
+
+    public function __construct(private BateauManagerInterface $bateauManager)
+    {
+    }
+
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
 
         $sortie = $options['sortie'];
+
+        $availableBoats = $this->bateauManager->areAvailable($sortie->getDateSortie(), $sortie->getCreneau());
         $builder
             ->add('type')
             ->add('dateSortie', null, [
@@ -46,11 +55,14 @@ class SortieEditType extends AbstractType
                         ->setParameter('securiteSurface', $sortie->getSecuriteSurface() ? $sortie->getSecuriteSurface()->getId() : 0);
                 },
             ])
-
-            /*->add('bateau', EntityType::class, [
+            ->add('bateau', EntityType::class, [
                 'class' => Bateau::class,
-                'choice_label' => 'immatriculation',
-            ])*/
+                'choice_label' => function (Bateau $bateau) {
+                    return $bateau->getImmatriculation() . ' (' . $bateau->getNbPlaces() . ' places)';
+                },
+                'choices' => $availableBoats,
+
+            ])
             ->add('piloteBateau', EntityType::class, [
                 'class' => Plongeur::class,
                 'choice_label' => function (Plongeur $moniteur) {
