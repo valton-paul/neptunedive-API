@@ -1,6 +1,6 @@
 # NeptuneDive
 
-## Comment utiliser l'application
+## Comment lancer l'application
 
 ### Vérification des ports
 Pour commencer, vous devez vérifier que les ports **8000** et **3306** soient bien ouverts.  
