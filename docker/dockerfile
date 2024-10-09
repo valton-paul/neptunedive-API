@@ -19,9 +19,8 @@ COPY ./docker/apache/000-default.conf /etc/apache2/sites-available/000-default.c
 
 RUN a2ensite 000-default.conf
 
-RUN chown -R www-data:www-data /var/www/html
-RUN chmod -R 755 /var/www/html
+RUN chown -R www-data:www-data /var/www/html/public
 
-RUN mysql -h database -u root -proot neptunedive < /var/www/html/docker/database/data.sql
+RUN chmod -R 755 /var/www/html/public
 
 EXPOSE 80
