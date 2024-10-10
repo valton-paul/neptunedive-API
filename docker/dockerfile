@@ -19,8 +19,8 @@ COPY ./docker/apache/000-default.conf /etc/apache2/sites-available/000-default.c
 
 RUN a2ensite 000-default.conf
 
-RUN chown -R www-data:www-data /var/www/html/public
+RUN chown -R www-data:www-data /var/www/html/neptunedive/public
 
-RUN chmod -R 755 /var/www/html/public
+RUN chmod -R 755 /var/www/html/neptunedive/public
 
 EXPOSE 80
