@@ -4,6 +4,7 @@ namespace App\Tests\Service;
 
 use App\Entity\Sortie;
 use App\Entity\Plongeur;
+use App\Enum\Creneaux;
 use App\Exception\AlreadyExistsException;
 use App\Exception\MemberNotFoundException;
 use App\Exception\NotAllowedException;
@@ -18,6 +19,7 @@ class SortieManagerTest extends TestCase
     private SortieManager $sortieManager;
     private EntityManagerInterface $entityManager;
     private Security $security;
+    private Plongeur $directeurPlongee;
     private Plongeur $plongeur;
     private Sortie $sortie;
 
@@ -32,6 +34,11 @@ class SortieManagerTest extends TestCase
         );
 
         $this->plongeur = (new Plongeur())
+            ->setPrenom("Bob")
+            ->setNom("Lemon")
+            ->setEmail("bob.l@gmail.com");
+
+        $this->directeurPlongee = (new Plongeur())
             ->setPrenom("Lény")
             ->setNom("Soulard")
             ->setEmail("moniteur@gmail.com")
@@ -39,25 +46,25 @@ class SortieManagerTest extends TestCase
 
         $this->sortie = (new Sortie())
             ->setDateSortie(new \DateTime('2025-10-12'))
-            ->setDirecteurPlongee($this->plongeur);
+            ->setDirecteurPlongee($this->directeurPlongee);
     }
 
     public function testSignUpForSuccess()
     {
-        $this->sortieManager->signUpFor($this->plongeur, $this->sortie);
-        $this->assertContains($this->plongeur, $this->sortie->getInscriptions());
+        $this->sortieManager->signUpFor($this->directeurPlongee, $this->sortie);
+        $this->assertContains($this->directeurPlongee, $this->sortie->getInscriptions());
     }
 
     public function testSignUpForAlreadyExistsException()
     {
-        $this->sortie->addInscription($this->plongeur); // Plongeur déjà inscrit
+        $this->sortie->addInscription($this->directeurPlongee);
         $this->expectException(AlreadyExistsException::class);
-        $this->sortieManager->signUpFor($this->plongeur, $this->sortie);
+        $this->sortieManager->signUpFor($this->directeurPlongee, $this->sortie);
     }
 
     public function testQuitSuccess()
     {
-        $this->sortie->addInscription($this->plongeur); // Plongeur déjà inscrit
+        $this->sortieManager->signUpFor($this->plongeur, $this->sortie);
         $this->sortieManager->quit($this->plongeur, $this->sortie);
         $this->assertNotContains($this->plongeur, $this->sortie->getInscriptions());
     }
@@ -65,42 +72,68 @@ class SortieManagerTest extends TestCase
     public function testQuitThrowMemberNotFoundException()
     {
         $this->expectException(MemberNotFoundException::class);
-        $this->sortieManager->quit($this->plongeur, $this->sortie); // Plongeur non inscrit
+        $this->sortieManager->quit($this->directeurPlongee, $this->sortie);
     }
 
     public function testQuitThrowNotAllowedException()
     {
-        $this->sortie->setDirecteurPlongee($this->plongeur); // Le plongeur est directeur de plongée
+        $this->sortieManager->signUpFor($this->directeurPlongee, $this->sortie);
         $this->expectException(NotAllowedException::class);
-        $this->sortieManager->quit($this->plongeur, $this->sortie);
+        $this->sortieManager->quit($this->directeurPlongee, $this->sortie);
     }
 
     public function testProcessNewSuccess()
     {
         $form = $this->createMock(FormInterface::class);
-        $this->security->method('isGranted')->willReturn(true); // ROLE_MONITEUR est accordé
-        $this->security->method('getUser')->willReturn($this->plongeur);
+        $this->security->method('isGranted')->willReturn(true);
+        $this->security->method('getUser')->willReturn($this->directeurPlongee);
 
-        $form->method('get')->willReturnCallback(function ($key) {
-            // Simule les données du formulaire
+        $dateField = $this->createMock(FormInterface::class);
+        $lieuField = $this->createMock(FormInterface::class);
+        $typeField = $this->createMock(FormInterface::class);
+        $creneauField = $this->createMock(FormInterface::class);
+        $directeurPlongeeField = $this->createMock(FormInterface::class);
+        $defaultField = $this->createMock(FormInterface::class); // Champ par défaut
+
+        $dateField->method('getData')->willReturn(new \DateTime('2025-10-12'));
+        $lieuField->method('getData')->willReturn('Brest');
+        $typeField->method('getData')->willReturn('mer');
+        $creneauField->method('getData')->willReturn(Creneaux::MATIN);
+        $directeurPlongeeField->method('getData')->willReturn($this->directeurPlongee);
+
+        $form->method('get')->willReturnCallback(function ($key) use (
+            $dateField,
+            $lieuField,
+            $typeField,
+            $creneauField,
+            $directeurPlongeeField,
+            $defaultField
+        ) {
             return match ($key) {
-                'dateSortie' => (new \DateTime('2025-10-12')),
-                'lieu' => 'Brest',
-                'type' => 'mer',
-                'creneau' => 'matin',
-                'directeurPlongee' => $this->plongeur,
-                default => null,
+                'dateSortie' => $dateField,
+                'lieu' => $lieuField,
+                'type' => $typeField,
+                'creneau' => $creneauField,
+                'directeurPlongee' => $directeurPlongeeField,
+                default => $defaultField, // Retourne un mock par défaut
             };
         });
 
         $this->sortieManager->processNew($this->sortie, $form);
-        $this->assertContains($this->plongeur, $this->sortie->getInscriptions());
+        $this->assertEquals(new \DateTime('2025-10-12'), $this->sortie->getDateSortie(), 'La date de la sortie devrait être 2025-10-12');
+        $this->assertEquals('Brest', $this->sortie->getLieu(), 'Le lieu devrait être "Brest"');
+        $this->assertEquals('mer', $this->sortie->getType(), 'Le type devrait être "mer"');
+        $this->assertEquals(Creneaux::MATIN, $this->sortie->getCreneau(), 'Le créneau devrait être "matin"');
+        $this->assertEquals($this->directeurPlongee, $this->sortie->getDirecteurPlongee(), 'Le directeur de plongée devrait être celui défini');
+        $this->assertContains($this->directeurPlongee, $this->sortie->getInscriptions(), 'Le directeur de plongée devrait être inscrit à la sortie');
     }
+
+
 
     public function testProcessNewThrowNotAllowedException()
     {
         $form = $this->createMock(FormInterface::class);
-        $this->security->method('isGranted')->willReturn(false); // ROLE_MONITEUR refusé
+        $this->security->method('isGranted')->willReturn(false);
 
         $this->expectException(NotAllowedException::class);
         $this->sortieManager->processNew($this->sortie, $form);
@@ -109,27 +142,54 @@ class SortieManagerTest extends TestCase
     public function testProcessEditSuccess()
     {
         $form = $this->createMock(FormInterface::class);
-        $this->security->method('isGranted')->willReturn(true); // ROLE_MONITEUR est accordé
+        $this->security->method('isGranted')->willReturn(true);
 
-        $form->method('get')->willReturnCallback(function ($key) {
+        $dateField = $this->createMock(FormInterface::class);
+        $lieuField = $this->createMock(FormInterface::class);
+        $typeField = $this->createMock(FormInterface::class);
+        $creneauField = $this->createMock(FormInterface::class);
+        $directeurPlongeeField = $this->createMock(FormInterface::class);
+        $defaultField = $this->createMock(FormInterface::class); // Champ par défaut
+
+        $dateField->method('getData')->willReturn(new \DateTime('2025-10-12'));
+        $lieuField->method('getData')->willReturn('Brest');
+        $typeField->method('getData')->willReturn('mer');
+        $creneauField->method('getData')->willReturn(Creneaux::MATIN);
+        $directeurPlongeeField->method('getData')->willReturn($this->directeurPlongee);
+
+        $form->method('get')->willReturnCallback(function ($key) use (
+            $dateField,
+            $lieuField,
+            $typeField,
+            $creneauField,
+            $directeurPlongeeField,
+            $defaultField
+        ) {
             return match ($key) {
-                'dateSortie' => (new \DateTime('2025-10-12')),
-                'lieu' => 'Brest',
-                'type' => 'mer',
-                'creneau' => 'matin',
-                'directeurPlongee' => $this->plongeur,
-                default => null,
+                'dateSortie' => $dateField,
+                'lieu' => $lieuField,
+                'type' => $typeField,
+                'creneau' => $creneauField,
+                'directeurPlongee' => $directeurPlongeeField,
+                default => $defaultField, // Retourne un mock par défaut
             };
         });
 
         $this->sortieManager->processEdit($this->sortie, $form);
-        $this->assertEquals('Brest', $this->sortie->getLieu());
+        $this->assertEquals(new \DateTime('2025-10-12'), $this->sortie->getDateSortie(), 'La date de la sortie devrait être 2025-10-12');
+        $this->assertEquals('Brest', $this->sortie->getLieu(), 'Le lieu devrait être "Brest"');
+        $this->assertEquals('mer', $this->sortie->getType(), 'Le type devrait être "mer"');
+        $this->assertEquals(Creneaux::MATIN, $this->sortie->getCreneau(), 'Le créneau devrait être "matin"');
+        $this->assertEquals($this->directeurPlongee, $this->sortie->getDirecteurPlongee(), 'Le directeur de plongée devrait être celui défini');
     }
+
+
+
 
     public function testProcessEditThrowNotAllowedException()
     {
         $form = $this->createMock(FormInterface::class);
-        $this->security->method('isGranted')->willReturn(false); // ROLE_MONITEUR refusé
+        $this->security->method('isGranted')->willReturn(false);
 
         $this->expectException(NotAllowedException::class);
         $this->sortieManager->processEdit($this->sortie, $form);
@@ -137,15 +197,18 @@ class SortieManagerTest extends TestCase
 
     public function testCancelSuccess()
     {
+        $this->entityManager->expects($this->once())
+            ->method('remove')
+            ->with($this->sortie);
+        $this->entityManager->expects($this->once())
+            ->method('flush');
         $this->sortieManager->cancel($this->sortie);
-        // Simuler la suppression via entityManager
-        $this->entityManager->expects($this->once())->method('remove')->with($this->sortie);
-        $this->entityManager->expects($this->once())->method('flush');
     }
+
 
     public function testCancelThrowNotAllowedException()
     {
-        $this->sortie->setDateSortie(new \DateTime('2023-10-03')); // Sortie passée
+        $this->sortie->setDateSortie(new \DateTime('2023-10-03'));
         $this->expectException(NotAllowedException::class);
         $this->sortieManager->cancel($this->sortie);
     }
