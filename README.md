@@ -10,7 +10,7 @@ Vous pouvez vérifier cela en utilisant la commande suivante dans votre terminal
 sudo netstat -tuln | grep -E '8000|3306'
 ```
 
-S'ils n'apparaissent pas, vous pouvez continuer.
+S'ils n'apparaissent pas, vous pouvez continuer sinon ouvrez les ports en désactivant le(s) système(s) qui les utilise.
 
 ### Lancement de l'application
 Pour démarrer l'application, il est nécessaire de cloner le projet. 

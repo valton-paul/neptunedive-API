@@ -13,14 +13,14 @@ RUN a2enmod rewrite
 
 RUN docker-php-ext-install pdo pdo_mysql
 
-COPY . /var/www/html
+COPY . /var/www/html/neptunedive
 
 COPY ./docker/apache/000-default.conf /etc/apache2/sites-available/000-default.conf
 
 RUN a2ensite 000-default.conf
 
-RUN chown -R www-data:www-data /var/www/html/public
+RUN chown -R www-data:www-data /var/www/html/neptunedive/public
 
-RUN chmod -R 755 /var/www/html/public
+RUN chmod -R 755 /var/www/html/neptunedive/public
 
 EXPOSE 80
