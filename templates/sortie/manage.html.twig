@@ -86,9 +86,12 @@
                     {% else %}
                         <span>{{ plongeur.prenom }} {{ plongeur.nom }}</span>
                     {% endif %}
+                    {% if plongeur != sortie.directeurPlongee %}
                     <button class="btn btn-danger" onclick="window.location.href='{{ path('quitSortie', {'id': sortie.id, 'idPlongeur': plongeur.id}) }}'">
                         Supprimer
                     </button>
+                    {% endif %}
+                    <br>
                 {% endfor %}
             </div>
         </div>
