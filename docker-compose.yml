@@ -31,7 +31,6 @@ services:
       - db
     command: >
       sh -c "echo 'Waiting for database...'; 
-      sleep 10;
       php bin/console doctrine:migrations:migrate --no-interaction;
       echo 'Running SQL file...';
       apt-get update && apt-get install -y default-mysql-client;
