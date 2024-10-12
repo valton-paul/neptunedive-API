@@ -11,9 +11,6 @@ services:
       - ./docker/database/data:/var/lib/mysql
     networks:
       - network
-    environment:
-      MYSQL_DATABASE: 'neptunedive'
-      MYSQL_ROOT_PASSWORD: 'root'
 
   app:
     build:
@@ -24,17 +21,11 @@ services:
       - "8000:80"
     networks:
       - network
-    environment:
-      - APP_ENV=dev
-      - DATABASE_URL=mysql://root:root@db:3306/neptunedive
     depends_on:
       - db
     command: >
-      sh -c "echo 'Waiting for database...'; 
+      sh -c "
       php bin/console doctrine:migrations:migrate --no-interaction;
-      echo 'Running SQL file...';
-      apt-get update && apt-get install -y default-mysql-client;
-      mysql -h database -u root -proot neptunedive < /var/www/html/neptunedive/docker/database/data.sql;
       echo 'Application accessible at localhost:8000';
       apache2-foreground
       "
