@@ -11,6 +11,9 @@ services:
       - ./docker/database/data:/var/lib/mysql
     networks:
       - network
+    environment:
+      MYSQL_DATABASE: neptunedive
+      MYSQL_ROOT_PASSWORD: root
 
   app:
     build:
