@@ -8,16 +8,21 @@ use App\Exception\AlreadyExistsException;
 use App\Exception\NotAllowedException;
 use App\Repository\PlongeurRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityRepository;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class UtilisateurManager implements UtilisateurManagerInterface
 {
+    private EntityManagerInterface $entityManager;
+    private EntityRepository $plongeurRepository;
+
     public function __construct(
         private UserPasswordHasherInterface $passwordHasher,
-        private PlongeurRepository $plongeurRepository,
-        private EntityManagerInterface $entityManager
+        private DatabaseContextResolver $resolver
     )
     {
+        $this->entityManager = $this->resolver->getEntityManager();
+        $this->plongeurRepository = $this->resolver->getRepository(Plongeur::class);
     }
 
     private

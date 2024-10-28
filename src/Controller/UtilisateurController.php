@@ -4,8 +4,11 @@ namespace App\Controller;
 
 use App\Entity\Plongeur;
 use App\Form\UtilisateurType;
+use App\Service\DatabaseContextResolver;
 use App\Service\UtilisateurManager;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
+use PHPUnit\Util\Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,8 +18,9 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 class UtilisateurController extends AbstractController
 {
     #[Route('/inscription', name: 'inscription', methods: ['GET', 'POST'])]
-    public function inscription(Request $request, UtilisateurManager $utilisateurManager, EntityManagerInterface $entityManager): Response
+    public function inscription(Request $request, UtilisateurManager $utilisateurManager, DatabaseContextResolver $resolver): Response
     {
+        $entityManager = $resolver->getEntityManager();
         $newUser = new Plongeur();
         $form = $this->createForm(UtilisateurType::class, $newUser, [
             'action' => $this->generateUrl('inscription'),
@@ -31,7 +35,7 @@ class UtilisateurController extends AbstractController
                 $entityManager->flush();
             } catch (\Exception $e) {
                 //TODO : afficher erreur
-                return $this->redirectToRoute('inscription');
+                throw new Exception($e);
             }
             return $this->redirectToRoute('test'); // TODO : rediriger vers connexion
         }

@@ -7,15 +7,20 @@ use App\Entity\Palanquee;
 use App\Exception\AlreadyExistsException;
 use App\Exception\NotAllowedException;
 use App\Repository\CommentaireRepository;
+use App\Service\DatabaseContextResolver;
+use Doctrine\ORM\EntityRepository;
 use Doctrine\Persistence\Event\LifecycleEventArgs;
 
 class CommentaireListener
 {
 
+    private EntityRepository $commentaireRepository;
+
     public function __construct(
-        private CommentaireRepository $commentaireRepository
+        private DatabaseContextResolver $resolver
     )
     {
+        $this->commentaireRepository = $this->resolver->getRepository(Commentaire::class);
     }
 
 

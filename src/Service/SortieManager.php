@@ -14,10 +14,13 @@ use Symfony\Component\Form\FormInterface;
 
 class SortieManager implements SortieManagerInterface
 {
+    private $entityManager;
 
-    public function __construct(private EntityManagerInterface $entityManager,
-                                private Security $security)
+    public function __construct(
+        private DatabaseContextResolver $provider,
+        private Security                $security)
     {
+        $this->entityManager = $this->provider->getEntityManager();
     }
 
     /**
@@ -76,7 +79,6 @@ class SortieManager implements SortieManagerInterface
             throw new NotAllowedException("Vous n'êtes pas autorisé à éditer une sortie");
         }
         $this->UpdateSortie($form, $sortie, $form->get('directeurPlongee')->getData());
-        dump($sortie->getInscriptions());
         $this->entityManager->persist($sortie);
         $this->entityManager->flush();
     }
@@ -87,7 +89,7 @@ class SortieManager implements SortieManagerInterface
     function cancel(Sortie $sortie): void
     {
         if ($sortie->getDateSortie() < new \DateTime()) {
-            throw new NotAllowedException("Vous ne pouvez pas annuler une sortie passée");
+            throw new NotAllowedException("Vous ne pouvez pas annuler une sortie    passée");
         }
         $this->entityManager->remove($sortie);
         $this->entityManager->flush();

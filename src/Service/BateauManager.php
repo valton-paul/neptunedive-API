@@ -6,16 +6,26 @@ use App\Entity\Bateau;
 use App\Enum\Creneaux;
 use App\Exception\NotAllowedException;
 use App\Exception\NotFoundException;
+use App\Repository\BateauRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Common\Collections\Collection;
 
 class BateauManager implements BateauManagerInterface
 {
+    private $entityManager;
+    private BateauRepository $repository;
 
     public function __construct(
-        private EntityManagerInterface $entityManager,
+        private DatabaseContextResolver $provider,
     )
-    {}
+    {
+        $this->entityManager = $this->provider->getEntityManager();
+        $repo = $this->provider->getRepository(Bateau::class);
+        if (!$repo instanceof BateauRepository) {
+            throw new NotAllowedException("Repo should be bateau repository");
+        }
+        $this->repository = $repo;
+    }
 
     function create(string $immatriculation, int $nbPlace): Bateau
     {
@@ -33,7 +43,7 @@ class BateauManager implements BateauManagerInterface
 
     function delete(Bateau $bateau): void
     {
-        $bateauExistant = $this->entityManager->getRepository(Bateau::class)->find($bateau->getId());
+        $bateauExistant = $this->repository->find($bateau->getId());
 
         if(!$bateauExistant) throw new NotFoundException();
 
@@ -43,7 +53,7 @@ class BateauManager implements BateauManagerInterface
 
     function update(Bateau $bateau, int $newNbPlace = null, string $newImmatriculation = null): Bateau
     {
-        $bateauExistant = $this->entityManager->getRepository(Bateau::class)->find($bateau->getId());
+        $bateauExistant = $this->repository->find($bateau->getId());
 
         if(!$bateauExistant){
             throw new NotFoundException('Boat not found');
@@ -70,6 +80,6 @@ class BateauManager implements BateauManagerInterface
      */
     function areAvailable(\DateTime $date, Creneaux $creneaux): array
     {
-        return $this->entityManager->getRepository(Bateau::class)->findAvailableBoats($date, $creneaux);
+        return $this->repository->findAvailableBoats($date, $creneaux);
     }
 }
