@@ -4,6 +4,9 @@ namespace App\Repository;
 
 use App\Entity\Plongeur;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -12,11 +15,11 @@ use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 /**
  * @extends ServiceEntityRepository<Plongeur>
  */
-class PlongeurRepository extends ServiceEntityRepository implements PasswordUpgraderInterface
+class PlongeurRepository extends EntityRepository implements PasswordUpgraderInterface
 {
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(EntityManagerInterface $em)
     {
-        parent::__construct($registry, Plongeur::class);
+        parent::__construct($em, $em->getClassMetadata(Plongeur::class));
     }
 
     /**

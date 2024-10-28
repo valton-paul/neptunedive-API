@@ -1,14 +1,10 @@
 <?php
-
 namespace App\Form\Sortie;
 
 use App\Entity\Bateau;
 use App\Entity\Plongeur;
 use App\Entity\Sortie;
 use App\Enum\Creneaux;
-use App\Repository\PlongeurRepository;
-use App\Service\BateauManagerInterface;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -16,18 +12,12 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class SortieEditType extends AbstractType
 {
-
-    public function __construct(private BateauManagerInterface $bateauManager)
-    {
-    }
-
-
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-
-        $sortie = $options['sortie'];
-
-        $availableBoats = $this->bateauManager->areAvailable($sortie->getDateSortie(), $sortie->getCreneau());
+        // Récupérer les options passées au formulaire
+        $moniteurs = $options['moniteurs'];
+        $bateaux = $options['bateaux'];
+        $sortie = $options['data'];
 
         $builder
             ->add('type')
@@ -42,61 +32,33 @@ class SortieEditType extends AbstractType
                     'Soir' => Creneaux::NUIT,
                 ],
             ])
-            ->add('securiteSurface', EntityType::class, [
-                'class' => Plongeur::class,
+            ->add('securiteSurface', ChoiceType::class, [
+                'choices' => $moniteurs,
                 'choice_label' => function (Plongeur $moniteur) {
                     return $moniteur->getPrenom() . ' ' . $moniteur->getNom();
                 },
-                'query_builder' => function (PlongeurRepository $repo) use ($sortie) {
-                    return $repo->createQueryBuilder('p')
-                        ->where('p.isMoniteur = :moniteur')
-                        ->setParameter('moniteur', 1)
-                        ->orderBy('CASE WHEN p.id = :securiteSurface THEN 0 ELSE 1 END', 'ASC')
-                        ->addOrderBy('p.nom', 'ASC')
-                        ->setParameter('securiteSurface', $sortie->getSecuriteSurface() ? $sortie->getSecuriteSurface()->getId() : 0);
-                },
+                'preferred_choices' => [$sortie->getSecuriteSurface()],
             ])
-            ->add('bateau', EntityType::class, [
-                'class' => Bateau::class,
+            ->add('bateau', ChoiceType::class, [
+                'choices' => $bateaux,
                 'choice_label' => function (Bateau $bateau) {
                     return $bateau->getImmatriculation() . ' (' . $bateau->getNbPlaces() . ' places)';
                 },
-                'choices' => $options['boats'],  // Liste des bateaux triée passée dans les options
-                'placeholder' => 'Pas de bateau',  // Option vide si aucun bateau n'est assigné
-                'required' => false, // Permet de laisser le choix vide
             ])
-
-
-            ->add('piloteBateau', EntityType::class, [
-                'class' => Plongeur::class,
+            ->add('piloteBateau', ChoiceType::class, [
+                'choices' => $moniteurs,
                 'choice_label' => function (Plongeur $moniteur) {
                     return $moniteur->getPrenom() . ' ' . $moniteur->getNom();
                 },
-                'query_builder' => function (PlongeurRepository $repo) use ($sortie) {
-                    return $repo->createQueryBuilder('p')
-                        ->where('p.isMoniteur = :moniteur')
-                        ->setParameter('moniteur', 1)
-                        ->orderBy('CASE WHEN p.id = :piloteBateau THEN 0 ELSE 1 END', 'ASC')
-                        ->addOrderBy('p.nom', 'ASC')
-                        ->setParameter('piloteBateau', $sortie->getPiloteBateau() ? $sortie->getPiloteBateau()->getId() : 0);
-                },
+                'preferred_choices' => [$sortie->getPiloteBateau()],
             ])
-            ->add('directeurPlongee', EntityType::class, [
-                'class' => Plongeur::class,
+            ->add('directeurPlongee', ChoiceType::class, [
+                'choices' => $moniteurs,
                 'choice_label' => function (Plongeur $moniteur) {
                     return $moniteur->getPrenom() . ' ' . $moniteur->getNom();
                 },
-                'query_builder' => function (PlongeurRepository $repo) use ($sortie) {
-                    return $repo->createQueryBuilder('p')
-                        ->where('p.isMoniteur = :moniteur')
-                        ->setParameter('moniteur', 1)
-                        ->orderBy('CASE WHEN p.id = :directeurPlongee THEN 0 ELSE 1 END', 'ASC')
-                        ->addOrderBy('p.nom', 'ASC')
-                        ->setParameter('directeurPlongee', $sortie->getDirecteurPlongee() ? $sortie->getDirecteurPlongee()->getId() : 0);
-                },
-            ])
-
-        ;
+                'preferred_choices' => [$sortie->getDirecteurPlongee()],
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
@@ -104,7 +66,6 @@ class SortieEditType extends AbstractType
         $resolver->setDefaults([
             'data_class' => Sortie::class,
         ]);
-        $resolver->setDefined(['sortie', 'boats']);
-
+        $resolver->setDefined(['moniteurs', 'bateaux']);
     }
 }

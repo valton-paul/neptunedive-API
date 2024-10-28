@@ -29,6 +29,3 @@ services:
     App\EventListener\PlongeurListener:
         tags:
             - { name: doctrine.event_listener, event: preUpdate }
-    App\EventListener\DatabaseSwitcherListener:
-        tags:
-            - { name: kernel.event_listener, event: kernel.controller, method: onKernelController }

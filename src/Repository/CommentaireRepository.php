@@ -4,16 +4,18 @@ namespace App\Repository;
 
 use App\Entity\Commentaire;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @extends ServiceEntityRepository<Commentaire>
  */
-class CommentaireRepository extends ServiceEntityRepository
+class CommentaireRepository extends EntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(EntityManagerInterface $em)
     {
-        parent::__construct($registry, Commentaire::class);
+        parent::__construct($em, $em->getClassMetadata(Commentaire::class));
     }
 
     //    /**

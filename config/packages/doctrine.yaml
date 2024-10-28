@@ -5,56 +5,47 @@ doctrine:
         url: '%env(resolve:DATABASE_URL)%'
         profiling_collect_backtrace: '%kernel.debug%'
         use_savepoints: true
-        wrapper_class: App\DBAL\MultiDbConnectionWrapper
+        wrapper_class: App\Connection\MultiDbConnectionWrapper
       upc:
         url: '%env(resolve:DATABASE_URL_UPC)%'
         profiling_collect_backtrace: '%kernel.debug%'
         use_savepoints: true
-        wrapper_class: App\DBAL\MultiDbConnectionWrapper
+        wrapper_class: App\Connection\MultiDbConnectionWrapper
       lol:
         url: '%env(resolve:DATABASE_URL_LOL)%'
         profiling_collect_backtrace: '%kernel.debug%'
         use_savepoints: true
-        wrapper_class: App\DBAL\MultiDbConnectionWrapper
+        wrapper_class: App\Connection\MultiDbConnectionWrapper
 
   orm:
     entity_managers:
       default:
         connection: default
-        auto_mapping: true  # Auto-mapping enabled only for 'default'
-        report_fields_where_declared: true
-        validate_xml_mapping: true
         naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
         mappings:
           App:
-            type: attribute
             is_bundle: false
+            type: attribute
             dir: '%kernel.project_dir%/src/Entity'
             prefix: 'App\Entity'
             alias: App
       upc:
         connection: upc
-        auto_mapping: false  # Disable auto_mapping for 'upc'
-        report_fields_where_declared: true
-        validate_xml_mapping: true
         naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
         mappings:
           App:
-            type: attribute
             is_bundle: false
+            type: attribute
             dir: '%kernel.project_dir%/src/Entity'
             prefix: 'App\Entity'
             alias: App
       lol:
         connection: lol
-        auto_mapping: false  # Disable auto_mapping for 'lol'
-        report_fields_where_declared: true
-        validate_xml_mapping: true
         naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
         mappings:
           App:
-            type: attribute
             is_bundle: false
+            type: attribute
             dir: '%kernel.project_dir%/src/Entity'
             prefix: 'App\Entity'
             alias: App
