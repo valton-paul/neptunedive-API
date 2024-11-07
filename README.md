@@ -1,43 +1,61 @@
-# NeptuneDive
+# Neptune Dive
+## Prérequis
 
-## Comment lancer l'application
+Avant de commencer, assurez-vous d'avoir installé l'un des outils suivants :
 
-### Vérification des ports
-Pour commencer, vous devez vérifier que les ports **8000** et **3306** soient bien ouverts.  
-Vous pouvez vérifier cela en utilisant la commande suivante dans votre terminal :
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) (Conseillé)
+- [Docker Engine](https://docs.docker.com/engine/install/)
+
+Pour vérifier si vous avez Docker, utilisez la commande suivante :
 
 ```bash
-sudo netstat -tuln | grep -E '8000|3306'
+docker --version
 ```
 
-S'ils n'apparaissent pas, vous pouvez continuer sinon ouvrez les ports en désactivant le(s) système(s) qui les utilise.
+## Installation et Lancement
 
-### Lancement de l'application
-Pour démarrer l'application, il est nécessaire de cloner le projet. 
-Pour ce faire, ouvrez votre terminal, accédez au répertoire où vous souhaitez le sauvegarder, puis utilisez l'une des commandes suivantes selon votre préférence :
+Suivez les étapes ci-dessous pour cloner, installer et démarrer le projet.
 
-Via SSH
+### 1. Cloner les dépôts
+
+Pour cloner les dépôts dans le même répertoire parent, exécutez les commandes suivantes (Linux) :
+
 ```bash
-git clone git@gitlabinfo.iutmontp.univ-montp2.fr:dream_team/neptunedive.git
+git clone -b 13-client-docker-compose https://gitlabinfo.iutmontp.univ-montp2.fr/dream_team/neptunedive.git &&
+git clone -b 13-client-docker-compose https://gitlabinfo.iutmontp.univ-montp2.fr/dream_team/neptunedivefront.git &&
 ```
 
-Via HTTPS
-```bash
-git clone https://gitlabinfo.iutmontp.univ-montp2.fr/dream_team/neptunedive.git
-```
+Sinon, si vous êtes sous Windows, copiez les liens pour récupérer les fichiers Zip et faites un dézippe de ces derniers (dans le même dossier parent).
 
-Une fois cela fait, démarrez Docker via Docker Desktop. 
-Si vous utilisez Docker Engine, démarrez Docker en exécutant la commande suivante :
+### 2. Lancer les dockers
 
-```bash
-sudo systemctl start docker
-```
+Ouvrez un terminal dans le dossier parent des deux projets (neptunedive et neptunedivefront).
 
-Une fois le projet cloné et Docker lancé, reprenez votre terminal (ou mettez-vous à la racine du projet) puis exécutez cette commande :
+Une fois dans le répertoire parent, exécutez les commandes suivantes :
 
 ```bash
+cd neptunedive &&
+docker network create shared_network &&
 docker compose up --build -d
 ```
 
-Attendez que les conteneurs soient lancés (Started).
-Et voilà, vous pouvez accéder à l'application via [localhost:8000](localhost:8000) (N'utilisez pas https://).
+Une fois que le conteneur du backend est lancé, passons au docker du frontend :
+
+```bash
+cd ../neptunedivefront &&
+docker compose up --build -d
+```
+
+### 3. Accéder à l'application
+
+Vous pouvez utiliser l'application via l'URL suivante [http://tenant2.localhost:5173](http://tenant2.localhost:5173)
+
+__Voici deux comptes pré-inscrits :__
+
+Un simple plongeur : 
+- email : __john.doe@gmail.com__
+- mot de passe : __Azerty123!__
+
+Un plongeur qui est moniteur :
+- email : __jean.dupont@gmail.com__
+- mot de passe : __Azerty123!__
