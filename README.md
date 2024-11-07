@@ -22,7 +22,7 @@ Pour cloner les dépôts dans le même répertoire parent, exécutez les command
 
 ```bash
 git clone -b 13-client-docker-compose https://gitlabinfo.iutmontp.univ-montp2.fr/dream_team/neptunedive.git &&
-git clone -b 13-client-docker-compose https://gitlabinfo.iutmontp.univ-montp2.fr/dream_team/neptunedivefront.git &&
+git clone -b 13-client-docker-compose https://gitlabinfo.iutmontp.univ-montp2.fr/dream_team/neptunedivefront.git
 ```
 
 Sinon, si vous êtes sous Windows, copiez les liens pour récupérer les fichiers Zip et faites un dézippe de ces derniers (dans le même dossier parent).
@@ -31,7 +31,7 @@ Sinon, si vous êtes sous Windows, copiez les liens pour récupérer les fichier
 
 Ouvrez un terminal dans le dossier parent des deux projets (neptunedive et neptunedivefront).
 
-Une fois dans le répertoire parent, exécutez les commandes suivantes :
+Une fois dans le répertoire parent, exécutez les commandes suivantes (si vous avez pas git clone les noms des dossiers seront neptunedive-13-client-docker-compose ou neptunedivefront-13-client-docker-compose):
 
 ```bash
 cd neptunedive &&
