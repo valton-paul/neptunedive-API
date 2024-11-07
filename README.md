@@ -1,10 +1,10 @@
 # Neptune Dive
 ## Prérequis
 
-Avant de commencer, assurez-vous d'avoir installé l'un des outils suivants :
+Avant de commencer, assurez-vous d'avoir installé les outils suivants :
 
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/) (Conseillé)
 - [Docker Engine](https://docs.docker.com/engine/install/)
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) (facultatif)
 
 Pour vérifier si vous avez Docker, utilisez la commande suivante :
 
