@@ -7,28 +7,14 @@
         {{ form_start(form) }}
         <fieldset>
             <div>
-                {{ form_label(form.email) }}
-                {{ form_widget(form.email) }}
+                <p>Nom : {{ demande.getNom }}</p>
+                <p>Prénom : {{ demande.getPrenom }}</p>
+                <p>Email : {{ demande.getEmail }}</p>
             </div>
 
             <div>
                 {{ form_label(form.plainPassword) }}
                 {{ form_widget(form.plainPassword) }}
-            </div>
-
-            <div>
-                {{ form_label(form.nom) }}
-                {{ form_widget(form.nom) }}
-            </div>
-
-            <div>
-                {{ form_label(form.prenom) }}
-                {{ form_widget(form.prenom) }}
-            </div>
-
-            <div>
-                {{ form_label(form.formation) }}
-                {{ form_widget(form.formation) }}
             </div>
 
             {{ form_widget(form.inscription) }}

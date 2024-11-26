@@ -2,20 +2,47 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
 use App\Repository\BateauRepository;
+use App\Security\Voter\MoniteurVoter;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotNull;
 
 #[ORM\Entity(repositoryClass: BateauRepository::class)]
+#[ApiResource(
+    operations: [
+        new Get(),
+        new Delete(),
+        new GetCollection(),
+        new Post(denormalizationContext: ["groups" => ["Default", "bateau:create"]],
+            validationContext: ["groups" => ["Default", "bateau:create"]]),
+        new Patch(denormalizationContext: ["groups" => ["Default", "bateau:update"]],
+            validationContext: ["groups" => ["Default", "bateau:update"]])
+    ],
+    normalizationContext: ["groups" => ["bateau:read"]],
+    security: "is_granted('MONITEUR_ACCES', object)"
+)]
 class Bateau
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(["bateau:read"])]
     private ?int $id = null;
 
+    #[Groups(["bateau:create", "bateau:read"])]
     #[ORM\Column(length: 50)]
+    #[NotBlank(groups: ["Default", "bateau:create"])]
+    #[NotNull(groups: ["Default", "bateau:create"])]
     private ?string $immatriculation = null;
 
     /**
@@ -25,6 +52,9 @@ class Bateau
     private Collection $sorties;
 
     #[ORM\Column]
+    #[Groups(["bateau:create", "bateau:update", "bateau:read"])]
+    #[NotBlank(groups: ["Default", "bateau:create"])]
+    #[NotNull(groups: ["Default", "bateau:create"])]
     private ?int $nbPlaces = null;
 
     public function __construct()

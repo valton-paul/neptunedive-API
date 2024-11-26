@@ -29,3 +29,13 @@ services:
     App\EventListener\PlongeurListener:
         tags:
             - { name: doctrine.event_listener, event: preUpdate }
+    App\EventListener\DatabaseSwitcherListener:
+        tags:
+            - { name: kernel.event_listener, event: kernel.controller, method: onKernelController }
+    # Nom personnalisé
+    acme_api.event.authentication_success_listener:
+        # Classe prenant en charge l'événement
+        class: App\EventListener\AuthenticationSuccessListener
+        # Précision de l’événement à capter
+        tags:
+            - { name: kernel.event_listener, event: lexik_jwt_authentication.on_authentication_success, method: onAuthenticationSuccessResponse }

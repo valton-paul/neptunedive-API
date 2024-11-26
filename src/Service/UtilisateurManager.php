@@ -8,7 +8,7 @@ use App\Exception\AlreadyExistsException;
 use App\Exception\NotAllowedException;
 use App\Repository\PlongeurRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\EntityRepository;
+use Exception;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class UtilisateurManager implements UtilisateurManagerInterface
@@ -25,23 +25,29 @@ class UtilisateurManager implements UtilisateurManagerInterface
         $this->plongeurRepository = $this->resolver->getRepository(Plongeur::class);
     }
 
-    private
+    public
     function chiffrerMotDePasse(Plongeur $plongeur, ?string $plainPassword): void
     {
         $hashed = $this->passwordHasher->hashPassword($plongeur, $plainPassword);
         $plongeur->setPassword($hashed);
     }
 
+    /**
+     * @throws AlreadyExistsException
+     */
     private
     function checkIfEmailExistsAlready(Plongeur $plongeur): void
     {
         $email = $plongeur->getEmail();
         $plongeur = $this->plongeurRepository->findOneBy(['email' => $email]);
         if ($plongeur) {
-            throw new \Exception('Cet email existe déjà');
+            throw new AlreadyExistsException('Cet email existe déjà');
         }
     }
 
+    /**
+     * @throws AlreadyExistsException
+     */
     function processNewUtilisateur(Plongeur $plongeur, ?string $plainPassword): void
     {
         $this->checkIfEmailExistsAlready($plongeur);

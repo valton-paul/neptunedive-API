@@ -1,0 +1,20 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste demandes inscription{% endblock %}
+
+{% block body %}
+    <main>
+        {% for demande in demandes %}
+            <div>
+                <p>Nom : {{ demande.getNom }}</p>
+                <p>Prénom : {{ demande.getPrenom }}</p>
+                <p>Email : {{ demande.getEmail }}</p>
+
+                <form action="{{ path('validerDemandeInscription') }}" method="post">
+                    <input type="hidden" name="id" value="{{ demande.getId }}">
+                    <button type="submit">Valider la demande</button>
+                </form>
+            </div>
+        {% endfor %}
+    </main>
+{% endblock %}

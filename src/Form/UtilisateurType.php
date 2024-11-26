@@ -24,10 +24,6 @@ class UtilisateurType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('email', EmailType::class, [
-                'label' => 'Adresse email',
-                'required' => true
-            ])
             ->add('plainPassword', PasswordType::class, [
                 'label' => 'Mot de passe',
                 'required' => true,
@@ -45,36 +41,15 @@ class UtilisateurType extends AbstractType
                     'maxlength' => 200
                 ]
             ])
-            ->add('nom', TextType::class, [
-                'label' => 'Nom',
-                'required' => true
-            ])
-            ->add('prenom', TextType::class, [
-                'label' => 'Prénom',
-                'required' => true
-            ])
-            ->add('formation', CheckboxType::class, [
-                'label' => 'En formation',
-                'required' => false
-            ])
-//            ->add('niveauPlongeeAutonome', NumberType::class, [
-//                'label' => 'Niveau de plongée autonome',
-//                'required' => true
-//            ])
-//            ->add('niveauPlongeeEncadre', NumberType::class, [
-//                'label' => 'Niveau de plongée encadrée',
-//                'required' => true
-//            ])
             ->add('inscription', SubmitType::class, [
                 'label' => 'Inscription'
             ]);
-
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => Plongeur::class,
+            'data_class' => null,
         ]);
     }
 }
