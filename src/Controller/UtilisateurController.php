@@ -34,10 +34,10 @@ class UtilisateurController extends AbstractController
                 $entityManager->persist($newUser);
                 $entityManager->flush();
             } catch (\Exception $e) {
-                //TODO : afficher erreur
-                throw new Exception($e);
+                $this->addFlash("error", $e->getMessage());
+                return $this->redirectToRoute('inscription');
             }
-            return $this->redirectToRoute('test'); // TODO : rediriger vers connexion
+            return $this->redirectToRoute('connexion');
         }
 
         return $this->render('utilisateur/inscription.html.twig', [

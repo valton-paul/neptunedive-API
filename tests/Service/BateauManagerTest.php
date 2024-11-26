@@ -3,12 +3,6 @@
 namespace App\Tests\Service;
 
 use App\Entity\Bateau;
-use App\Entity\Plongeur;
-use App\Entity\Sortie;
-use App\Enum\Creneaux;
-use App\Enum\NiveauMoniteur;
-use App\Enum\NiveauPlongeeAutonome;
-use App\Enum\NiveauPlongeeEncadre;
 use App\Exception\NotAllowedException;
 use App\Exception\NotFoundException;
 use App\Repository\BateauRepository;

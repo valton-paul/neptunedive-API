@@ -9,6 +9,7 @@ services:
       - "3306:3306"
     volumes:
       - ./docker/database/data:/var/lib/mysql
+
     networks:
       - network
     environment:
@@ -18,7 +19,7 @@ services:
   app:
     build:
       context: .
-      dockerfile: ./docker/dockerfile
+      dockerfile: docker/Dockerfile
     container_name: neptunedive-app
     ports:
       - "8000:80"
@@ -26,6 +27,7 @@ services:
       - network
     depends_on:
       - db
+    working_dir: /var/www/html/neptunedive  # Définit le répertoire de travail
     command: >
       sh -c "
       php bin/console doctrine:migrations:migrate --no-interaction;

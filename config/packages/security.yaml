@@ -19,13 +19,22 @@ security:
             security: false
         main:
             lazy: true
-            provider: context_user_provider
-            form_login:
-                login_path: connexion
-                check_path: connexion
-                default_target_path: test #TODO : changer chemin par défaut après connexion
-                always_use_default_target_path: true
-                enable_csrf: true
+
+            #L'application est sans état (pas de session)
+            stateless: true
+            #Le nom du provider que nous avons configuré plus tôt
+            provider: app_user_provider
+            json_login:
+                #Le nom de la route d'authentification
+                check_path: /api/auth
+                #La propriété correspondant au login dans notre entité
+                username_path: email
+                #La propriété correspondant au mot de passe (haché) dans notre entité
+                password_path: password
+                #Les services qui gèrent le succès ou l'échec d'authentification
+                success_handler: lexik_jwt_authentication.handler.authentication_success
+                failure_handler: lexik_jwt_authentication.handler.authentication_failure
+            jwt: ~
 
             logout:
                 path: /deconnexion

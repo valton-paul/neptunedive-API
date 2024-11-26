@@ -64,7 +64,7 @@ class SortieManager implements SortieManagerInterface
         $this->UpdateSortie($form, $sortie, $this->security->getUser());
         $plongeur = $this->security->getUser();
         if ($plongeur instanceof Plongeur) {
-            $sortie->addInscription($plongeur);
+            $sortie->addInscriptionSorty($plongeur);
         }
         $this->entityManager->persist($sortie);
         $this->entityManager->flush();
