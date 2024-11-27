@@ -29,7 +29,6 @@ use Symfony\Component\Validator\Constraints\NotNull;
             validationContext: ["groups" => ["Default", "bateau:update"]])
     ],
     normalizationContext: ["groups" => ["bateau:read"]],
-    security: "is_granted('MONITEUR_ACCES', object)"
 )]
 class Bateau
 {

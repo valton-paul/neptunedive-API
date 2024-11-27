@@ -6,8 +6,9 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -40,7 +41,7 @@ class Lieu
     private ?string $description = null;
 
     #[ORM\Column(type: "blob", nullable: true)]
-    #[Groups(["lieu:read", "lieu:create", "lieu:update"])]
+    #[Groups(["lieu:read"])]
     private $photo;
 
     #[ORM\Column(length: 512)]
@@ -48,6 +49,17 @@ class Lieu
     #[Assert\NotBlank(groups: ["Default", "lieu:create"])]
     #[Assert\NotNull(groups: ["Default", "lieu:create"])]
     private ?string $lienMaps = null;
+
+    /**
+     * @var Collection<int, Sortie>
+     */
+    #[ORM\OneToMany(targetEntity: Sortie::class, mappedBy: 'idLieu')]
+    private Collection $sorties;
+
+    public function __construct()
+    {
+        $this->sorties = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -101,6 +113,36 @@ class Lieu
     public function setLienMaps(?string $lienMaps): void
     {
         $this->lienMaps = $lienMaps;
+    }
+
+    /**
+     * @return Collection<int, Sortie>
+     */
+    public function getSorties(): Collection
+    {
+        return $this->sorties;
+    }
+
+    public function addSorty(Sortie $sorty): static
+    {
+        if (!$this->sorties->contains($sorty)) {
+            $this->sorties->add($sorty);
+            $sorty->setIdLieu($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSorty(Sortie $sorty): static
+    {
+        if ($this->sorties->removeElement($sorty)) {
+            // set the owning side to null (unless already changed)
+            if ($sorty->getIdLieu() === $this) {
+                $sorty->setIdLieu(null);
+            }
+        }
+
+        return $this;
     }
 
 }

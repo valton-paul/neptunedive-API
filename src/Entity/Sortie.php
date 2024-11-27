@@ -99,18 +99,6 @@ class Sortie
     #[Groups(['sortie:read', 'inscriptionSortie:sortie:read', 'sortie:create', "sortie:update"])]
     private ?\DateTimeInterface $dateSortie = null;
 
-    #[ORM\Column(length: 255)]
-    #[NotBlank(groups: ['sortie:create'])]
-    #[NotNull(groups: ['sortie:create'])]
-    #[Groups(['sortie:read', 'inscriptionSortie:sortie:read', 'sortie:create', "sortie:update"])]
-    private ?string $lieu = null;
-
-    #[ORM\Column(type: 'string', length: 50, enumType: Creneaux::class)]
-    #[NotBlank(groups: ['sortie:create'])]
-    #[NotNull(groups: ['sortie:create'])]
-    #[Groups(['sortie:read', 'inscriptionSortie:sortie:read', 'sortie:create', "sortie:update"])]
-    private ?Creneaux $creneau = null;
-
     #[ORM\ManyToOne(targetEntity: Plongeur::class,inversedBy: 'sortiesDP')]
     #[ORM\JoinColumn(nullable: false)]
     #[NotBlank(groups: ['sortie:create'])]
@@ -148,6 +136,21 @@ class Sortie
     #[Groups(['sortie:read'])]
     private Collection $inscriptions;
 
+    #[ORM\ManyToOne(inversedBy: 'sorties')]
+    #[ORM\JoinColumn(nullable: false)]
+    #[NotBlank(groups: ['sortie:create'])]
+    #[NotNull(groups: ['sortie:create'])]
+    #[Groups(['sortie:read', 'inscriptionSortie:sortie:read', 'sortie:create', "sortie:update"])]
+    private ?Lieu $idLieu = null;
+
+    #[ORM\Column(length: 255)]
+    #[Groups(['sortie:read', 'inscriptionSortie:sortie:read', 'sortie:create', "sortie:update"])]
+    private ?string $heureSortie = null;
+
+    #[ORM\Column]
+    #[Groups(['sortie:read', 'inscriptionSortie:sortie:read', 'sortie:create', "sortie:update"])]
+    private ?int $nbMaxInscription = null;
+
     public function __construct()
     {
         $this->palanquees = new ArrayCollection();
@@ -183,17 +186,6 @@ class Sortie
         return $this;
     }
 
-    public function getLieu(): ?string
-    {
-        return $this->lieu;
-    }
-
-    public function setLieu(string $lieu): static
-    {
-        $this->lieu = $lieu;
-
-        return $this;
-    }
 
     public function getCreneau(): ?Creneaux
     {
@@ -314,5 +306,39 @@ class Sortie
         }
 
         return $this;
+    }
+
+    public function getIdLieu(): ?Lieu
+    {
+        return $this->idLieu;
+    }
+
+    public function setIdLieu(?Lieu $idLieu): static
+    {
+        $this->idLieu = $idLieu;
+
+        return $this;
+    }
+
+    public function getHeureSortie(): ?string
+    {
+        return $this->heureSortie;
+    }
+
+    public function setHeureSortie(string $heureSortie): static
+    {
+        $this->heureSortie = $heureSortie;
+
+        return $this;
+    }
+
+    public function getNbMaxInscription(): ?int
+    {
+        return $this->nbMaxInscription;
+    }
+
+    public function setNbMaxInscription(?int $nbMaxInscription): void
+    {
+        $this->nbMaxInscription = $nbMaxInscription;
     }
 }

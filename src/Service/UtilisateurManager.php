@@ -8,6 +8,7 @@ use App\Exception\AlreadyExistsException;
 use App\Exception\NotAllowedException;
 use App\Repository\PlongeurRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityRepository;
 use Exception;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
