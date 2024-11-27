@@ -25,6 +25,9 @@ class APIUserController extends AbstractController
             'email' => $user->getEmail(),
             'roles' => $user->getRoles(),
             'isMoniteur' => $user->isMoniteur(),
+            'niveauMoniteur' => $user->getNiveauMoniteur(),
+            'niveauPlongeeAutonome' => $user->getNiveauPlongeeAutonome(),
+            'niveauPlongeeEncadre' => $user->getNiveauPlongeeEncadre(),
         ]);
     }
 
