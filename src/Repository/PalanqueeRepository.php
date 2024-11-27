@@ -18,6 +18,61 @@ class PalanqueeRepository extends EntityRepository
         parent::__construct($em, $em->getClassMetadata(Palanquee::class));
     }
 
+    public function findPalanqueesWithoutCommentsForEncadrant(int $encadrantId): array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+
+        $sql = "
+            SELECT sortie_id, ap.plongeur_id, encadrant_id,
+                   pl.nom, pl.prenom,
+                   duree_prevue, duree_realisee, profondeur_prevue,
+                   profondeur_realisee, type, date_sortie, lieu, creneau
+            FROM palanquee p
+            JOIN assignation_palanquee ap ON p.id = ap.palanquee_id
+            JOIN sortie s on p.sortie_id = s.id
+            JOIN plongeur pl on ap.plongeur_id = pl.id
+            WHERE p.encadrant_id = :encadrantId 
+              AND NOT EXISTS (
+                SELECT 1 
+                FROM commentaire c 
+                WHERE c.plongeur_id = ap.plongeur_id 
+                  AND c.sortie_id = p.sortie_id
+            )
+        ";
+
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery(['encadrantId' => $encadrantId]);
+
+        return $resultSet->fetchAllAssociative(); // Renvoie un tableau associatif
+    }
+
+    public function findPalanqueesWithoutCommentsForAllEncadrant(): array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+
+        $sql = "
+            SELECT sortie_id, ap.plongeur_id, encadrant_id,
+                   pl.nom, pl.prenom,
+                   duree_prevue, duree_realisee, profondeur_prevue,
+                   profondeur_realisee, type, date_sortie, lieu, creneau
+            FROM palanquee p
+            JOIN assignation_palanquee ap ON p.id = ap.palanquee_id
+            JOIN sortie s on p.sortie_id = s.id
+            JOIN plongeur pl on ap.plongeur_id = pl.id
+            WHERE NOT EXISTS (
+                SELECT 1 
+                FROM commentaire c 
+                WHERE c.plongeur_id = ap.plongeur_id 
+                  AND c.sortie_id = p.sortie_id
+            )
+        ";
+
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery();
+
+        return $resultSet->fetchAllAssociative(); // Renvoie un tableau associatif
+    }
+
     //    /**
     //     * @return Palanquee[] Returns an array of Palanquee objects
     //     */
