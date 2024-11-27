@@ -49,7 +49,7 @@ use Symfony\Component\Validator\Constraints\NotNull;
                 ),
             ],
             description: "Récupère les sorties d'un plongeur.",
-            normalizationContext: ['groups' => ['inscriptionSortie:sortie:read']],
+            normalizationContext: ['groups' => ['inscriptionSortie:sortie:read', 'sortie:read']],
             provider: PlongeurSortiesProvider::class
         ),
         new GetCollection(
@@ -61,7 +61,7 @@ use Symfony\Component\Validator\Constraints\NotNull;
                 ),
             ],
             description: "Récupère les sorties où le plongeur n'est pas inscrit.",
-            normalizationContext: ['groups' => ['inscriptionSortie:sortie:read']],
+            normalizationContext: ['groups' => ['inscriptionSortie:sortie:read', 'sortie:read']],
             provider: PlongeurSortiesNotEnrolledProvider::class
         ),
         new GetCollection(
@@ -147,6 +147,10 @@ class Sortie
     #[ORM\OneToMany(targetEntity: InscriptionSortie::class, mappedBy: 'sortie', cascade: ['persist'], orphanRemoval: true)]
     #[Groups(['sortie:read'])]
     private Collection $inscriptions;
+
+    #[Groups(['sortie:read'])]
+    #[ORM\Column(nullable: true)]
+    private ?int $nbMaxInscription = null;
 
     public function __construct()
     {
@@ -312,6 +316,18 @@ class Sortie
                 $inscriptionSorty->setSortie(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getNbMaxInscription(): ?int
+    {
+        return $this->nbMaxInscription;
+    }
+
+    public function setNbMaxInscription(?int $nbMaxInscription): static
+    {
+        $this->nbMaxInscription = $nbMaxInscription;
 
         return $this;
     }
