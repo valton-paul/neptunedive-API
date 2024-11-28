@@ -6,6 +6,7 @@ use App\Repository\PalanqueeRepository;
 use App\Repository\PlongeurRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
@@ -33,6 +34,23 @@ class APIPlongeurController extends AbstractController
     public function getPalanqueesWithoutCommentsAllEncadrant(): JsonResponse {
         $palanquees = $this->palanqueeRepository->findPalanqueesWithoutCommentsForAllEncadrant();
         return $this->json($palanquees); // Convertit directement le tableau en JSON
+    }
+
+    #[Route('/run-script', name: 'run_script', methods: ['POST'])]
+    public function runScript(): JsonResponse
+    {
+        $output = null;
+        $returnVar = null;
+
+        // Commande pour exécuter le script Python
+        $scriptPath = "../ScriptPython/spond.py";
+        exec("python3 $scriptPath", $output, $returnVar);
+
+        if ($returnVar !== 0) {
+            return new JsonResponse(['error' => 'Erreur lors de l\'exécution du script', 'output' => $output], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+
+        return new JsonResponse(['message' => 'Script exécuté avec succès', 'output' => $output]);
     }
 
 }
