@@ -6,6 +6,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
+use App\State\Lieu\PhotoProvider;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -16,11 +17,13 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ApiResource(
     operations: [
         new Get(),
-        new GetCollection(),
+        new GetCollection(
+            provider: PhotoProvider::class
+        ),
         new Post(inputFormats: ['multipart' => ['multipart/form-data']])
     ],
     normalizationContext: ['groups' => ['lieu:read']],
-    denormalizationContext: ['groups' => ['lieu:create', 'lieu:update']]
+    denormalizationContext: ['groups' => ['lieu:create', 'lieu:update']],
 )]
 class Lieu
 {
@@ -41,7 +44,7 @@ class Lieu
     private ?string $description = null;
 
     #[ORM\Column(type: "blob", nullable: true)]
-    #[Groups(["lieu:read"])]
+    #[Groups(["lieu:read", "lieu:create"])]
     private $photo;
 
     #[ORM\Column(length: 512)]
@@ -93,10 +96,11 @@ class Lieu
 
     public function getPhoto(): ?string
     {
-        if (is_resource($this->photo)) {
-            return stream_get_contents($this->photo);
-        }
+        return (string) $this->photo;
+    }
 
+    public function getPhotoResource(): mixed
+    {
         return $this->photo;
     }
 

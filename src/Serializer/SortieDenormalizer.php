@@ -55,7 +55,6 @@ class SortieDenormalizer implements DenormalizerInterface, DenormalizerAwareInte
     public function denormalize($data, $class, $format = null, array $context = [])
     {
         //Convertir le champ $data["ville"] contenant un id simple en IRI
-        //On indique bien quelle est l'entité visée (ici, Ville)
         $data['directeurPlongee'] = $this->iriConverter->getIriFromResource(resource: Plongeur::class, context: ['uri_variables' => ['id' => $data['directeurPlongee']]]);
         $data['securiteSurface'] = $this->iriConverter->getIriFromResource(resource: Plongeur::class, context: ['uri_variables' => ['id' => $data['securiteSurface']]]);
         $data['idLieu'] = $this->iriConverter->getIriFromResource(resource: Lieu::class, context: ['uri_variables' => ['id' => $data['idLieu']]]);
