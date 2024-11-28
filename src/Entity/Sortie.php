@@ -152,6 +152,11 @@ class Sortie
     #[ORM\Column(nullable: true)]
     private ?int $nbMaxInscription = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?string $idSpond = null;
+
+
+
     public function __construct()
     {
         $this->palanquees = new ArrayCollection();
@@ -329,6 +334,17 @@ class Sortie
     {
         $this->nbMaxInscription = $nbMaxInscription;
 
+        return $this;
+    }
+
+    public function getIdSpond(): ?string
+    {
+        return $this->idSpond;
+    }
+
+    public function setIdSpond(?string $idSpond): static
+    {
+        $this->idSpond = $idSpond;
         return $this;
     }
 }

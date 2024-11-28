@@ -85,6 +85,8 @@ class InscriptionSortie
     #[Groups(['inscriptionSortie:read', "inscriptionSortie:write", 'inscriptionSortie:plongeur:read'])]
     private ?Plongeur $plongeur = null;
 
+
+
     public function getId(): ?int
     {
         return $this->id;
