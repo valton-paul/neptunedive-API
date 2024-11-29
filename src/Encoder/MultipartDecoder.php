@@ -26,22 +26,23 @@ final class MultipartDecoder implements DecoderInterface
         $requestData = $request->request->all();
         $files = $request->files->all();
 
-        if (isset($files['photo']) && $files['photo'] instanceof UploadedFile) {
-            $uploadedFile = $files['photo'];
+        foreach ($files as $key => $file) {
+            if ($file instanceof UploadedFile) {
+                $stream = fopen($file->getPathname(), 'rb');
 
-            $stream = fopen($uploadedFile->getPathname(), 'rb');
+                if ($stream === false) {
+                    throw new \RuntimeException(sprintf('Unable to open file stream for key "%s".', $key));
+                }
 
-            if ($stream === false) {
-                throw new \RuntimeException('Unable to open file stream for photo.');
+                $requestData[$key] = $stream;
+            } else {
+                throw new \InvalidArgumentException(sprintf('The field "%s" must be a valid file.', $key));
             }
-
-            $requestData['photo'] = $stream;
-        } else {
-            throw new \InvalidArgumentException('The photo field is required.');
         }
 
         return $requestData;
     }
+
 
 
     public function supportsDecoding(string $format): bool
