@@ -16,39 +16,42 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity]
 #[ApiResource(
     operations: [
-        new Get(),
+        new Get(
+            denormalizationContext: ['groups' => ['lieu:create', 'lieu:update']]
+        ),
         new GetCollection(
+            denormalizationContext: ['groups' => ['lieu:create', 'lieu:update']],
             provider: PhotoProvider::class
         ),
-        new Post(inputFormats: ['multipart' => ['multipart/form-data']])
+        new Post(inputFormats: ['multipart' => ['multipart/form-data']]
+        )
     ],
-    normalizationContext: ['groups' => ['lieu:read']],
-    denormalizationContext: ['groups' => ['lieu:create', 'lieu:update']],
+    normalizationContext: ['groups' => ['lieu:read', 'sortie:read']],
 )]
 class Lieu
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups("lieu:read")]
+    #[Groups(["lieu:read", "sortie:read"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["lieu:read", "lieu:create", "lieu:update"])]
+    #[Groups(["lieu:read", "sortie:read", "lieu:create", "lieu:update"])]
     #[Assert\NotBlank(groups: ["Default", "lieu:create"])]
     #[Assert\NotNull(groups: ["Default", "lieu:create"])]
     private ?string $nomLieu = null;
 
     #[ORM\Column(length: 1024, nullable: true)]
-    #[Groups(["lieu:read", "lieu:create", "lieu:update"])]
+    #[Groups(["lieu:read", "sortie:read", "lieu:create", "lieu:update"])]
     private ?string $description = null;
 
     #[ORM\Column(type: "blob", nullable: true)]
-    #[Groups(["lieu:read", "lieu:create"])]
+    #[Groups(["lieu:read", "sortie:read", "sortie:read", "lieu:create"])]
     private $photo;
 
     #[ORM\Column(length: 512)]
-    #[Groups(["lieu:read", "lieu:create", "lieu:update"])]
+    #[Groups(["lieu:read", "sortie:read", "lieu:create", "lieu:update"])]
     #[Assert\NotBlank(groups: ["Default", "lieu:create"])]
     #[Assert\NotNull(groups: ["Default", "lieu:create"])]
     private ?string $lienMaps = null;

@@ -77,7 +77,7 @@ use Symfony\Component\Validator\Constraints\NotNull;
             provider: PlongeurSortiesHistoriqueProvider::class
         )
     ],
-    normalizationContext: ["groups" => ["sortie:read",'inscriptionSortie:plongeur:read']]
+    normalizationContext: ["groups" => ["sortie:read",'inscriptionSortie:plongeur:read', 'lieu:read']]
 )]
 class Sortie
 {
