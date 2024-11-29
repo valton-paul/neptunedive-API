@@ -38,7 +38,7 @@ class Bateau
     #[Groups(["bateau:read"])]
     private ?int $id = null;
 
-    #[Groups(["bateau:create", "bateau:read"])]
+    #[Groups(["bateau:create", "bateau:read", "bateau:update"])]
     #[ORM\Column(length: 50)]
     #[NotBlank(groups: ["Default", "bateau:create"])]
     #[NotNull(groups: ["Default", "bateau:create"])]
