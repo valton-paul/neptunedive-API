@@ -77,7 +77,7 @@ use Symfony\Component\Validator\Constraints\NotNull;
             provider: PlongeurSortiesHistoriqueProvider::class
         )
     ],
-    normalizationContext: ["groups" => ["sortie:read",'inscriptionSortie:plongeur:read', 'lieu:read']]
+    normalizationContext: ["groups" => ["sortie:read",'inscriptionSortie:plongeur:read', 'lieu:read', 'sortie:read']]
 )]
 class Sortie
 {
@@ -330,15 +330,5 @@ class Sortie
         $this->heureSortie = $heureSortie;
 
         return $this;
-    }
-
-    public function getNbMaxInscription(): ?int
-    {
-        return $this->nbMaxInscription;
-    }
-
-    public function setNbMaxInscription(?int $nbMaxInscription): void
-    {
-        $this->nbMaxInscription = $nbMaxInscription;
     }
 }
