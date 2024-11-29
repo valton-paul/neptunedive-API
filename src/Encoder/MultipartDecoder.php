@@ -1,5 +1,4 @@
 <?php
-// api/src/Encoder/MultipartDecoder.php
 
 namespace App\Encoder;
 
