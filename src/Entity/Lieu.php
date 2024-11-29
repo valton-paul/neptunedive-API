@@ -10,6 +10,7 @@ use App\State\Lieu\PhotoProvider;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use phpDocumentor\Reflection\Types\Resource_;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -99,7 +100,11 @@ class Lieu
 
     public function getPhoto(): ?string
     {
-        return (string) $this->photo;
+        if (is_resource($this->photo)) {
+            return base64_encode(stream_get_contents($this->photo));
+        }
+
+        return null;
     }
 
     public function getPhotoResource(): mixed
