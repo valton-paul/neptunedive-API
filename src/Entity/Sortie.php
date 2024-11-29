@@ -49,7 +49,7 @@ use Symfony\Component\Validator\Constraints\NotNull;
                 ),
             ],
             description: "Récupère les sorties d'un plongeur.",
-            normalizationContext: ['groups' => ['inscriptionSortie:sortie:read']],
+            normalizationContext: ['groups' => ['inscriptionSortie:sortie:read', "sortie:read"]],
             provider: PlongeurSortiesProvider::class
         ),
         new GetCollection(
@@ -61,7 +61,7 @@ use Symfony\Component\Validator\Constraints\NotNull;
                 ),
             ],
             description: "Récupère les sorties où le plongeur n'est pas inscrit.",
-            normalizationContext: ['groups' => ['inscriptionSortie:sortie:read']],
+            normalizationContext: ['groups' => ['inscriptionSortie:sortie:read', "sortie:read"]],
             provider: PlongeurSortiesNotEnrolledProvider::class
         ),
         new GetCollection(
@@ -73,7 +73,7 @@ use Symfony\Component\Validator\Constraints\NotNull;
                 ),
             ],
             description: "Récupère l'historique des sorties d'un plongeur.",
-            normalizationContext: ['groups' => ['inscriptionSortie:sortie:read']],
+            normalizationContext: ['groups' => ['inscriptionSortie:sortie:read', "sortie:read"]],
             provider: PlongeurSortiesHistoriqueProvider::class
         )
     ],
