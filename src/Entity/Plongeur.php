@@ -190,6 +190,13 @@ class Plongeur implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: AssignationPalanquee::class, mappedBy: 'plongeur', cascade: ['persist'], orphanRemoval: true)]
     private Collection $assignationPalanquees;
 
+    /**
+     * @var Collection<int, IgnoredSorties>
+     */
+    #[ORM\OneToMany(targetEntity: IgnoredSorties::class, mappedBy: 'plongeur')]
+    #[Groups(["plongeur:read"])]
+    private Collection $ignoredSorties;
+
 
     public function __construct()
     {
@@ -198,6 +205,7 @@ class Plongeur implements UserInterface, PasswordAuthenticatedUserInterface
         $this->palanquees = new ArrayCollection();
         $this->sorties = new ArrayCollection();
         $this->assignationPalanquees = new ArrayCollection();
+        $this->ignoredSorties = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -533,6 +541,36 @@ class Plongeur implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($assignationPalanquee->getPlongeur() === $this) {
                 $assignationPalanquee->setPlongeur(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, IgnoredSorties>
+     */
+    public function getIgnoredSorties(): Collection
+    {
+        return $this->ignoredSorties;
+    }
+
+    public function addIgnoredSorty(IgnoredSorties $ignoredSorty): static
+    {
+        if (!$this->ignoredSorties->contains($ignoredSorty)) {
+            $this->ignoredSorties->add($ignoredSorty);
+            $ignoredSorty->setPlongeur($this);
+        }
+
+        return $this;
+    }
+
+    public function removeIgnoredSorty(IgnoredSorties $ignoredSorty): static
+    {
+        if ($this->ignoredSorties->removeElement($ignoredSorty)) {
+            // set the owning side to null (unless already changed)
+            if ($ignoredSorty->getPlongeur() === $this) {
+                $ignoredSorty->setPlongeur(null);
             }
         }
 

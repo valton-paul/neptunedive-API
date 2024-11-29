@@ -15,15 +15,15 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 class UtilisateurManager implements UtilisateurManagerInterface
 {
     private EntityManagerInterface $entityManager;
-    private EntityRepository $plongeurRepository;
+
 
     public function __construct(
         private UserPasswordHasherInterface $passwordHasher,
+        private PlongeurRepository $plongeurRepository,
         private DatabaseContextResolver $resolver
     )
     {
         $this->entityManager = $this->resolver->getEntityManager();
-        $this->plongeurRepository = $this->resolver->getRepository(Plongeur::class);
     }
 
     public

@@ -296,6 +296,18 @@ class Sortie
         return $this;
     }
 
+    public function getNbMaxInscription(): ?int
+    {
+        return $this->nbMaxInscription;
+    }
+
+    public function setNbMaxInscription(?int $nbMaxInscription): static
+    {
+        $this->nbMaxInscription = $nbMaxInscription;
+
+        return $this;
+    }
+
     public function getIdLieu(): ?Lieu
     {
         return $this->idLieu;
