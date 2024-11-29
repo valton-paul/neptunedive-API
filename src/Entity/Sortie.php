@@ -152,6 +152,10 @@ class Sortie
     #[ORM\Column(nullable: true)]
     private ?int $nbMaxInscription = null;
 
+    #[ORM\Column(nullable: true)]
+    #[Groups(['sortie:read'])]
+    private ?float $price = null;
+
     public function __construct()
     {
         $this->palanquees = new ArrayCollection();
@@ -328,6 +332,18 @@ class Sortie
     public function setNbMaxInscription(?int $nbMaxInscription): static
     {
         $this->nbMaxInscription = $nbMaxInscription;
+
+        return $this;
+    }
+
+    public function getPrice(): ?float
+    {
+        return $this->price;
+    }
+
+    public function setPrice(?float $price): static
+    {
+        $this->price = $price;
 
         return $this;
     }
