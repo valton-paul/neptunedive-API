@@ -187,18 +187,6 @@ class Sortie
     }
 
 
-    public function getCreneau(): ?Creneaux
-    {
-        return $this->creneau;
-    }
-
-    public function setCreneau(Creneaux $creneau): static
-    {
-        $this->creneau = $creneau;
-
-        return $this;
-    }
-
     public function getDirecteurPlongee(): ?Plongeur
     {
         return $this->directeurPlongee;
