@@ -43,21 +43,28 @@ class InscriptionPlongeurManager implements InscriptionPlongeurManagerInterface
         }
     }
 
-    public
-    function processNewInscription(CreateInscriptionInput $data): void
+    private function DTOtoEntity(CreateInscriptionInput $input): InscriptionPlongeur
     {
         $inscriptionPlongeur = new InscriptionPlongeur();
 
-        $inscriptionPlongeur->setEmail($data->email);
-        $inscriptionPlongeur->setNom($data->nom);
-        $inscriptionPlongeur->setPrenom($data->prenom);
-        $inscriptionPlongeur->setFormation($data->formation ?? false);
-        $inscriptionPlongeur->setNiveauPlongeeAutonome($data->niveauPlongeeAutonome);
-        $inscriptionPlongeur->setNiveauPlongeeEncadre($data->niveauPlongeeEncadre);
-        $inscriptionPlongeur->setNiveauMoniteur($data->niveauMoniteur);
-        $inscriptionPlongeur->setPhotoDeProfil($data->photoDeProfil);
-        $inscriptionPlongeur->setCarteNiveau($data->carteNiveau);
-        $inscriptionPlongeur->setCertificatMedical($data->certificatMedical);
+        $inscriptionPlongeur->setEmail($input->email);
+        $inscriptionPlongeur->setNom($input->nom);
+        $inscriptionPlongeur->setPrenom($input->prenom);
+        $inscriptionPlongeur->setFormation($input->formation ?? false);
+        $inscriptionPlongeur->setNiveauPlongeeAutonome($input->niveauPlongeeAutonome);
+        $inscriptionPlongeur->setNiveauPlongeeEncadre($input->niveauPlongeeEncadre);
+        $inscriptionPlongeur->setNiveauMoniteur($input->niveauMoniteur);
+        $inscriptionPlongeur->setPhotoDeProfil($input->photoDeProfil);
+        $inscriptionPlongeur->setCarteNiveau($input->carteNiveau);
+        $inscriptionPlongeur->setCertificatMedical($input->certificatMedical);
+
+        return $inscriptionPlongeur;
+    }
+
+    public
+    function processNewInscription(CreateInscriptionInput $data): void
+    {
+        $inscriptionPlongeur = $this->DTOtoEntity($data);
 
         $this->checkIfEmailExistsAlready($inscriptionPlongeur);
         $inscriptionPlongeur->setValidee(false);
