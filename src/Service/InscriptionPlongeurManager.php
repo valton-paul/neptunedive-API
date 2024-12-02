@@ -57,6 +57,10 @@ class InscriptionPlongeurManager implements InscriptionPlongeurManagerInterface
         $inscriptionPlongeur->setPhotoDeProfil($input->photoDeProfil);
         $inscriptionPlongeur->setCarteNiveau($input->carteNiveau);
         $inscriptionPlongeur->setCertificatMedical($input->certificatMedical);
+        $inscriptionPlongeur->setPossedeMasquePlongee($input->possedeMasquePlongee ?? false);
+        $inscriptionPlongeur->setTailleStab($input->tailleStab);
+        $inscriptionPlongeur->setTaillePalmes($input->taillePalmes);
+        $inscriptionPlongeur->setTailleCombinaison($input->tailleCombinaison);
 
         return $inscriptionPlongeur;
     }
@@ -92,6 +96,13 @@ class InscriptionPlongeurManager implements InscriptionPlongeurManagerInterface
         if ($inscriptionPlongeur->getNiveauPlongeeEncadre() != null) {
             $plongeur->setNiveauPlongeeEncadre($inscriptionPlongeur->getNiveauPlongeeEncadre());
         }
+        $plongeur->setPhotoDeProfil($inscriptionPlongeur->getPhotoDeProfilRessource());
+        $plongeur->setCarteNiveau($inscriptionPlongeur->getCarteNiveauRessource());
+        $plongeur->setCertificatMedical($inscriptionPlongeur->getCertificatMedicalRessource());
+        $plongeur->setPossedeMasquePlongee($inscriptionPlongeur->isPossedeMasquePlongee());
+        $plongeur->setTailleStab($inscriptionPlongeur->getTailleStab());
+        $plongeur->setTaillePalmes($inscriptionPlongeur->getTaillePalmes());
+        $plongeur->setTailleCombinaison($inscriptionPlongeur->getTailleCombinaison());
 
         $this->utilisateurManager->processNewUtilisateur($plongeur, $plainPassword);
 

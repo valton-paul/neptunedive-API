@@ -132,6 +132,22 @@ class InscriptionPlongeur
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $tokenExpiration = null;
 
+    #[ORM\Column(length: 255)]
+    #[Groups(['inscription:read'])]
+    private ?string $tailleStab = null;
+
+    #[ORM\Column(length: 255)]
+    #[Groups(['inscription:read'])]
+    private ?string $taillePalmes = null;
+
+    #[ORM\Column]
+    #[Groups(['inscription:read'])]
+    private ?bool $possedeMasquePlongee = null;
+
+    #[ORM\Column(length: 255)]
+    #[Groups(['inscription:read'])]
+    private ?string $tailleCombinaison = null;
+
     /**
      * @return bool|null
      */
@@ -334,6 +350,54 @@ class InscriptionPlongeur
     public function setTokenExpiration(?\DateTimeInterface $tokenExpiration): static
     {
         $this->tokenExpiration = $tokenExpiration;
+
+        return $this;
+    }
+
+    public function getTailleStab(): ?string
+    {
+        return $this->tailleStab;
+    }
+
+    public function setTailleStab(?string $tailleStab): static
+    {
+        $this->tailleStab = $tailleStab;
+
+        return $this;
+    }
+
+    public function getTaillePalmes(): ?string
+    {
+        return $this->taillePalmes;
+    }
+
+    public function setTaillePalmes(?string $taillePalmes): static
+    {
+        $this->taillePalmes = $taillePalmes;
+
+        return $this;
+    }
+
+    public function isPossedeMasquePlongee(): ?bool
+    {
+        return $this->possedeMasquePlongee;
+    }
+
+    public function setPossedeMasquePlongee(bool $possedeMasquePlongee): static
+    {
+        $this->possedeMasquePlongee = $possedeMasquePlongee;
+
+        return $this;
+    }
+
+    public function getTailleCombinaison(): ?string
+    {
+        return $this->tailleCombinaison;
+    }
+
+    public function setTailleCombinaison(?string $tailleCombinaison): static
+    {
+        $this->tailleCombinaison = $tailleCombinaison;
 
         return $this;
     }

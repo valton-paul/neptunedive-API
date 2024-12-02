@@ -22,6 +22,9 @@ class CreateInscriptionInput
     #[Assert\Type("bool")]
     public ?bool $formation = null;
 
+    #[Assert\Type("bool")]
+    public ?bool $possedeMasquePlongee = null;
+
     public ?NiveauPlongeeAutonome $niveauPlongeeAutonome = null;
     public ?NiveauPlongeeEncadre $niveauPlongeeEncadre = null;
     public ?NiveauMoniteur $niveauMoniteur = null;
@@ -30,13 +33,17 @@ class CreateInscriptionInput
     public $carteNiveau = null;
     public $certificatMedical = null;
 
+    public ?string $tailleStab = null;
+    public ?string $taillePalmes = null;
+    public ?string $tailleCombinaison = null;
+
     // Setter pour "formation"
     public function setFormation(string $formation): void
     {
         $this->formation = match (strtolower($formation)) {
             "true" => true,
             "false" => false,
-            default => null,
+            default => false,
         };
     }
 
@@ -84,5 +91,29 @@ class CreateInscriptionInput
     public function setCertificatMedical($certificatMedical): void
     {
         $this->certificatMedical = $certificatMedical;
+    }
+
+    public function setPossedeMasquePlongee(string $possedeMasquePlongee): void
+    {
+        $this->possedeMasquePlongee = match (strtolower($possedeMasquePlongee)) {
+            "true" => true,
+            "false" => false,
+            default => false,
+        };
+    }
+
+    public function setTailleCombinaison(?string $tailleCombinaison): void
+    {
+        $this->tailleCombinaison = $tailleCombinaison;
+    }
+
+    public function setTaillePalmes(?string $taillePalmes): void
+    {
+        $this->taillePalmes = $taillePalmes;
+    }
+
+    public function setTailleStab(?string $tailleStab): void
+    {
+        $this->tailleStab = $tailleStab;
     }
 }
