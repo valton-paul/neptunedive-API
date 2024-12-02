@@ -3,17 +3,22 @@ import csv
 from spond import spond
 from datetime import datetime
 import tempfile
-
+import argparse
 
 
 # Identifiants et paramètres de connexion
-username = 'soulardleny@gmail.com'
-password = 'joupette24**'
+
+
+parser = argparse.ArgumentParser(description="Spond Script")
+parser.add_argument("--username", required=True, help="Votre email Spond")
+parser.add_argument("--password", required=True, help="Votre mot de passe Spond")
+parser.add_argument("--group_id", required=True, help="Votre ID de groupe Spond")
+args = parser.parse_args()
+
 csv_file_path = tempfile.mktemp(suffix='.csv', dir="/var/www/html/neptunedive/src/ScriptPython/tmpCSV")  # Chemin du fichier CSV
-group_id = 'BACCCFEB4849435FA1C5A2591BD028F7'
 today = datetime.utcnow()
 
-async def main():
+async def main(username, password, group_id):
     # Initialisation du client Spond
     s = spond.Spond(username=username, password=password)
 
@@ -41,14 +46,14 @@ async def main():
             # Séparer la date et l'heure de 'startTimestamp'
             start_timestamp = event['endTimestamp']
             start_datetime = datetime.strptime(start_timestamp, '%Y-%m-%dT%H:%M:%SZ')
-            event_date = start_datetime.date()
+            event_date = start_datetime.date().strftime('%d-%m-%Y')
             event_time = start_datetime.time()
 
             # Extraire les informations pertinentes pour l'événement
             event_info = {
                 'Titre': event['heading'],
                 'ID': event['id'],
-                'Lieu': event['location']['address'],
+                'Lieu': event['location']['feature'],
                 'Date': event_date,  # La date seule
                 'Heure': event_time,  # L'heure seule
                 'Participants': ', '.join(accepted_participants)  # Liste des participants
@@ -73,4 +78,5 @@ async def main():
         await s.clientsession.close()
 
 # Lancer la fonction principale
-asyncio.run(main())
+asyncio.run(main(args.username, args.password, args.group_id))
+

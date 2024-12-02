@@ -2,13 +2,19 @@
 
 namespace App\Service;
 
+use App\Entity\InscriptionSortie;
 use App\Entity\Plongeur;
 use App\Entity\Sortie;
+use App\Enum\Creneaux;
 use App\Exception\AlreadyExistsException;
 use App\Exception\MemberNotFoundException;
 use App\Exception\NotAllowedException;
-use App\Service\SortieManagerInterface;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Exception\NotFoundException;
+use App\Repository\SortieRepository;
+use DateException;
+use DateTime;
+use Doctrine\ORM\Exception\ORMException;
+use Doctrine\ORM\OptimisticLockException;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\FormInterface;
 
@@ -18,7 +24,9 @@ class SortieManager implements SortieManagerInterface
 
     public function __construct(
         private DatabaseContextResolver $provider,
-        private Security                $security)
+        private Security $security,
+        private SortieRepository $sortieRepository
+    )
     {
         $this->entityManager = $this->provider->getEntityManager();
     }
@@ -28,10 +36,13 @@ class SortieManager implements SortieManagerInterface
      */
     function signUpFor(Plongeur $plongeur, Sortie $sortie): void
     {
-        if ($sortie->getInscriptions()->contains($plongeur)) {
+        $inscription = new InscriptionSortie();
+        $inscription->setPlongeur($plongeur);
+        $inscription->setSortie($sortie);
+        if ($sortie->getInscriptions()->contains($inscription)) {
             throw new AlreadyExistsException();
         }
-        $sortie->addInscription($plongeur);
+        $sortie->addInscriptionSorty($inscription);
         $this->entityManager->persist($sortie);
         $this->entityManager->flush();
     }
@@ -88,7 +99,7 @@ class SortieManager implements SortieManagerInterface
      */
     function cancel(Sortie $sortie): void
     {
-        if ($sortie->getDateSortie() < new \DateTime()) {
+        if ($sortie->getDateSortie() < new DateTime()) {
             throw new NotAllowedException("Vous ne pouvez pas annuler une sortie    passée");
         }
         $this->entityManager->remove($sortie);
@@ -98,14 +109,15 @@ class SortieManager implements SortieManagerInterface
     /**
      * @param FormInterface $form
      * @param Sortie $sortie
+     * @param $directeurPlongee
      * @return void
-     * @throws \DateException
+     * @throws DateException
      */
     private function UpdateSortie(FormInterface $form, Sortie $sortie, $directeurPlongee): void
     {
         $date = $form->get('dateSortie')->getData();
-        if ($date < new \DateTime()) {
-            throw new \DateException();
+        if ($date < new DateTime()) {
+            throw new DateException();
         }
         $sortie->setDateSortie($date);
         $sortie->setLieu($form->get('lieu')->getData());
@@ -118,4 +130,73 @@ class SortieManager implements SortieManagerInterface
     }
 
 
+    function getSortiesSpond($username, $password, $idGroupe): array
+    {
+        $scriptPath = __DIR__ . '/../ScriptPython/spondScript.py';
+
+        exec("python3 $scriptPath --username $username --password $password --group_id $idGroupe", $csvFilePath);
+
+        if ($csvFilePath === []) {
+            throw new NotFoundException('Aucune sortie trouvée');
+        }
+
+        // Vérifier si le fichier existe
+        if (!file_exists($csvFilePath[0])) {
+            throw new NotFoundException('Le fichier CSV est introuvable');
+        }
+
+        // Lire le contenu du fichier CSV
+        $handle = fopen($csvFilePath[0], 'r');
+        if (!$handle) {
+            throw new \Exception('Impossible d\'ouvrir le fichier CSV.');
+        }
+
+        // Lire la première ligne (en-têtes du fichier CSV)
+        $headers = fgetcsv($handle);
+        $sortiesJson = [];
+        // Boucler sur chaque ligne du fichier
+        while (($data = fgetcsv($handle)) !== false) {
+            // Associe les données aux en-têtes
+            $row = array_combine($headers, $data);
+            if (!$this->sortieRepository->findOneBy(['idSpond' => $row['ID']])) {
+                $heure = new \DateTime($row['Heure'] ?? null);
+                if ($heure < new \DateTime('12:00')) {
+                    $creneau = Creneaux::MATIN;
+                } else {
+                    $creneau = Creneaux::APRES_MIDI;
+                }
+                $sortieJson = [
+                    'idSpond' => $row['ID'] ?? null,
+                    'lieu' => $row['Lieu'] ?? null,
+                    'dateSortie' => $row['Date'] ?? null,
+                    'creneau' => $creneau,
+                    'participants' => explode(',', $row['Participants'])
+                ];
+                $sortiesJson[] = $sortieJson;
+            }
+        }
+        fclose($handle);
+        unlink($csvFilePath[0]);
+        return $sortiesJson;
+    }
+
+
+    function processNewArray(array $sortie, $idSpondSortie): Sortie
+    {
+        $newSortie = new Sortie();
+        $newSortie->setIdSpond($idSpondSortie);
+        $newSortie->setLieu($sortie['lieu']);
+        $newSortie->setType("Mer");
+        $newSortie->setDirecteurPlongee($this->security->getUser());
+        $newSortie->setSecuriteSurface($this->security->getUser());
+        $newSortie->setDateSortie(new DateTime($sortie['dateSortie']));
+        if ($sortie['creneau'] === 'matin') {
+            $newSortie->setCreneau(Creneaux::MATIN);
+        } else {
+            $newSortie->setCreneau(Creneaux::APRES_MIDI);
+        }
+        $this->entityManager->persist($newSortie);
+        $this->entityManager->flush();
+        return $newSortie;
+    }
 }
