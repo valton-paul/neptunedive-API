@@ -42,6 +42,15 @@ class PlongeurRepository extends EntityRepository implements PasswordUpgraderInt
         $this->getEntityManager()->flush();
     }
 
+    public function getAllHasNotPaidASortie() {
+        return $this->createQueryBuilder('p')
+            ->leftJoin('p.sorties', 'i')
+            ->join('i.sortie', 's')
+            ->andWhere('s.price > 0')
+            ->andWhere('i.paymentDate IS NULL')
+            ->getQuery()
+            ->getResult();
+    }
 
     //    /**
     //     * @return Plongeur[] Returns an array of Plongeur objects
