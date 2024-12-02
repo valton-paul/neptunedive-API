@@ -94,7 +94,7 @@ class Plongeur implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['plongeur:read', 'inscriptionSortie:plongeur:read', 'assignationPalanquee:plongeur:read'])]
+    #[Groups(['plongeur:read', 'inscriptionSortie:plongeur:read', 'assignationPalanquee:plongeur:read', 'inscriptionSortie:sortie:read'])]
     private ?int $id = null;
 
     #[NotBlank(groups: ["plongeur:create"])]

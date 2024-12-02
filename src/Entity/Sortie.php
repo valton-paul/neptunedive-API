@@ -73,7 +73,7 @@ use Symfony\Component\Validator\Constraints\NotNull;
                 ),
             ],
             description: "Récupère l'historique des sorties d'un plongeur.",
-            normalizationContext: ['groups' => ['inscriptionSortie:sortie:read']],
+            normalizationContext: ['groups' => ['inscriptionSortie:sortie:read', 'sortie:read']],
             provider: PlongeurSortiesHistoriqueProvider::class
         )
     ],
@@ -152,6 +152,9 @@ class Sortie
     #[ORM\Column(nullable: true)]
     private ?int $nbMaxInscription = null;
 
+    /**
+     * @var float|null Price in euros
+     */
     #[ORM\Column(nullable: true)]
     #[Groups(['sortie:read'])]
     private ?float $price = null;
@@ -336,6 +339,10 @@ class Sortie
         return $this;
     }
 
+    /**
+     * Get the value of price in euros
+     * @return float|null
+     */
     public function getPrice(): ?float
     {
         return $this->price;
