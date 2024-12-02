@@ -9,7 +9,7 @@ nelmio_cors:
         allow_credentials: true
     paths:
         '^/api/':
-            allow_origin: ['http://localhost:5173'] # Adresse frontend
+            allow_origin: ['https://localhost:5173'] # Adresse frontend
             allow_headers: ['Content-Type', 'Authorization']
             allow_methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS']
             allow_credentials: true
