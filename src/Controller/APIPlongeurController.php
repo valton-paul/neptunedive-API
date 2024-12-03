@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Repository\InscriptionSortieRepository;
 use App\Repository\PalanqueeRepository;
 use App\Repository\PlongeurRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -13,7 +14,8 @@ class APIPlongeurController extends AbstractController
 {
 
     public function __construct(
-        private PalanqueeRepository $palanqueeRepository,
+        private PalanqueeRepository         $palanqueeRepository,
+        private readonly PlongeurRepository $plongeurRepository,
     )
     {
 
@@ -35,4 +37,10 @@ class APIPlongeurController extends AbstractController
         return $this->json($palanquees); // Convertit directement le tableau en JSON
     }
 
+    #[Route("/api/filter/hasNotPaidInscriptionSortie", name: 'api_plongeurs_has_not_paid_sortie', methods: ["GET"])]
+    #[IsGranted('ROLE_ADMIN')]
+    public function getPlongeursHasNotPaidInscriptionSortie(): JsonResponse {
+        $plongeurs = $this->plongeurRepository->getAllHasNotPaidASortie();
+        return $this->json($plongeurs);
+    }
 }

@@ -49,7 +49,7 @@ use Symfony\Component\Validator\Constraints\NotNull;
                 ),
             ],
             description: "Récupère les sorties d'un plongeur.",
-            normalizationContext: ['groups' => ['inscriptionSortie:sortie:read', 'sortie:read']],
+            normalizationContext: ['groups' => ['inscriptionSortie:sortie:read', "sortie:read"]],
             provider: PlongeurSortiesProvider::class
         ),
         new GetCollection(
@@ -61,7 +61,7 @@ use Symfony\Component\Validator\Constraints\NotNull;
                 ),
             ],
             description: "Récupère les sorties où le plongeur n'est pas inscrit.",
-            normalizationContext: ['groups' => ['inscriptionSortie:sortie:read', 'sortie:read']],
+            normalizationContext: ['groups' => ['inscriptionSortie:sortie:read', "sortie:read"]],
             provider: PlongeurSortiesNotEnrolledProvider::class
         ),
         new GetCollection(
@@ -73,11 +73,11 @@ use Symfony\Component\Validator\Constraints\NotNull;
                 ),
             ],
             description: "Récupère l'historique des sorties d'un plongeur.",
-            normalizationContext: ['groups' => ['inscriptionSortie:sortie:read']],
+            normalizationContext: ['groups' => ['inscriptionSortie:sortie:read', 'sortie:read']],
             provider: PlongeurSortiesHistoriqueProvider::class
         )
     ],
-    normalizationContext: ["groups" => ["sortie:read",'inscriptionSortie:plongeur:read']]
+    normalizationContext: ["groups" => ["sortie:read",'inscriptionSortie:plongeur:read', 'lieu:read', 'sortie:read']]
 )]
 class Sortie
 {
@@ -98,18 +98,6 @@ class Sortie
     #[NotNull(groups: ['sortie:create'])]
     #[Groups(['sortie:read', 'inscriptionSortie:sortie:read', 'sortie:create', "sortie:update"])]
     private ?\DateTimeInterface $dateSortie = null;
-
-    #[ORM\Column(length: 255)]
-    #[NotBlank(groups: ['sortie:create'])]
-    #[NotNull(groups: ['sortie:create'])]
-    #[Groups(['sortie:read', 'inscriptionSortie:sortie:read', 'sortie:create', "sortie:update"])]
-    private ?string $lieu = null;
-
-    #[ORM\Column(type: 'string', length: 50, enumType: Creneaux::class)]
-    #[NotBlank(groups: ['sortie:create'])]
-    #[NotNull(groups: ['sortie:create'])]
-    #[Groups(['sortie:read', 'inscriptionSortie:sortie:read', 'sortie:create', "sortie:update"])]
-    private ?Creneaux $creneau = null;
 
     #[ORM\ManyToOne(targetEntity: Plongeur::class,inversedBy: 'sortiesDP')]
     #[ORM\JoinColumn(nullable: false)]
@@ -148,9 +136,27 @@ class Sortie
     #[Groups(['sortie:read'])]
     private Collection $inscriptions;
 
-    #[Groups(['sortie:read'])]
-    #[ORM\Column(nullable: true)]
+    #[ORM\ManyToOne(inversedBy: 'sorties')]
+    #[ORM\JoinColumn(nullable: false)]
+    #[NotBlank(groups: ['sortie:create'])]
+    #[NotNull(groups: ['sortie:create'])]
+    #[Groups(['sortie:read', 'inscriptionSortie:sortie:read', 'sortie:create', "sortie:update"])]
+    private ?Lieu $idLieu = null;
+
+    #[ORM\Column(length: 255)]
+    #[Groups(['sortie:read', 'inscriptionSortie:sortie:read', 'sortie:create', "sortie:update"])]
+    private ?string $heureSortie = null;
+
+    #[ORM\Column]
+    #[Groups(['sortie:read', 'inscriptionSortie:sortie:read', 'sortie:create', "sortie:update"])]
     private ?int $nbMaxInscription = null;
+
+    /**
+     * @var float|null Price in euros
+     */
+    #[ORM\Column(nullable: true)]
+    #[Groups(['sortie:read', 'inscriptionSortie:sortie:read'])]
+    private ?float $price = null;
 
     public function __construct()
     {
@@ -187,29 +193,6 @@ class Sortie
         return $this;
     }
 
-    public function getLieu(): ?string
-    {
-        return $this->lieu;
-    }
-
-    public function setLieu(string $lieu): static
-    {
-        $this->lieu = $lieu;
-
-        return $this;
-    }
-
-    public function getCreneau(): ?Creneaux
-    {
-        return $this->creneau;
-    }
-
-    public function setCreneau(Creneaux $creneau): static
-    {
-        $this->creneau = $creneau;
-
-        return $this;
-    }
 
     public function getDirecteurPlongee(): ?Plongeur
     {
@@ -328,6 +311,46 @@ class Sortie
     public function setNbMaxInscription(?int $nbMaxInscription): static
     {
         $this->nbMaxInscription = $nbMaxInscription;
+
+        return $this;
+    }
+
+    public function getIdLieu(): ?Lieu
+    {
+        return $this->idLieu;
+    }
+
+    public function setIdLieu(?Lieu $idLieu): static
+    {
+        $this->idLieu = $idLieu;
+
+        return $this;
+    }
+
+    public function getHeureSortie(): ?string
+    {
+        return $this->heureSortie;
+    }
+
+    public function setHeureSortie(string $heureSortie): static
+    {
+        $this->heureSortie = $heureSortie;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of price in euros
+     * @return float|null
+     */
+    public function getPrice(): ?float
+    {
+        return $this->price;
+    }
+
+    public function setPrice(?float $price): static
+    {
+        $this->price = $price;
 
         return $this;
     }

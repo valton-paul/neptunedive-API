@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -11,6 +12,7 @@ use ApiPlatform\Metadata\Put;
 use App\Repository\InscriptionSortieRepository;
 use App\State\Inscription\InscriptionSortieProcessor;
 use App\State\Inscription\InscriptionSortieProvider;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Attribute\Groups;
@@ -82,8 +84,16 @@ class InscriptionSortie
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     #[NotNull(groups: ['inscriptionSortie:write'])]
     #[NotBlank(groups: ['inscriptionSortie:write'])]
-    #[Groups(['inscriptionSortie:read', "inscriptionSortie:write", 'inscriptionSortie:plongeur:read'])]
+    #[Groups(['inscriptionSortie:read', "inscriptionSortie:write", 'inscriptionSortie:plongeur:read', 'sortie:read'])]
     private ?Plongeur $plongeur = null;
+
+    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+    #[ApiProperty(writable: false)]
+    #[Groups(['inscriptionSortie:read', 'inscriptionSortie:plongeur:read', 'inscriptionSortie:sortie:read'])]
+    private ?\DateTimeInterface $paymentDate = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $paymentId = null;
 
     public function getId(): ?int
     {
@@ -110,6 +120,30 @@ class InscriptionSortie
     public function setPlongeur(?Plongeur $plongeur): static
     {
         $this->plongeur = $plongeur;
+
+        return $this;
+    }
+
+    public function getPaymentDate(): ?\DateTimeInterface
+    {
+        return $this->paymentDate;
+    }
+
+    public function setPaymentDate(?\DateTimeInterface $paymentDate): static
+    {
+        $this->paymentDate = $paymentDate;
+
+        return $this;
+    }
+
+    public function getPaymentId(): ?int
+    {
+        return $this->paymentId;
+    }
+
+    public function setPaymentId(?int $paymentId): static
+    {
+        $this->paymentId = $paymentId;
 
         return $this;
     }
