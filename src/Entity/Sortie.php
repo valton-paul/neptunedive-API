@@ -155,7 +155,7 @@ class Sortie
      * @var float|null Price in euros
      */
     #[ORM\Column(nullable: true)]
-    #[Groups(['sortie:read'])]
+    #[Groups(['sortie:read', 'inscriptionSortie:sortie:read'])]
     private ?float $price = null;
 
     public function __construct()
