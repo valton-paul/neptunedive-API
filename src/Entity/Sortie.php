@@ -77,14 +77,14 @@ use Symfony\Component\Validator\Constraints\NotNull;
             provider: PlongeurSortiesHistoriqueProvider::class
         )
     ],
-    normalizationContext: ["groups" => ["sortie:read",'inscriptionSortie:plongeur:read']]
+    normalizationContext: ["groups" => ["sortie:read",'inscriptionSortie:plongeur:read', "commentaire:sortie:read"]],
 )]
 class Sortie
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['sortie:read', 'inscriptionSortie:sortie:read'])]
+    #[Groups(['sortie:read', 'inscriptionSortie:sortie:read', "commentaire:sortie:read"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 100)]

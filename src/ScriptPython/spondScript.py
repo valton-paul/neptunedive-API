@@ -46,7 +46,7 @@ async def main(username, password, group_id):
             # Séparer la date et l'heure de 'startTimestamp'
             start_timestamp = event['endTimestamp']
             start_datetime = datetime.strptime(start_timestamp, '%Y-%m-%dT%H:%M:%SZ')
-            event_date = start_datetime.date().strftime('%d-%m-%Y')
+            event_date = start_datetime.date()
             event_time = start_datetime.time()
 
             # Extraire les informations pertinentes pour l'événement
