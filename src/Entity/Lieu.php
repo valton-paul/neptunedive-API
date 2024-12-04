@@ -3,14 +3,13 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
-use App\State\Lieu\PhotoProvider;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use phpDocumentor\Reflection\Types\Resource_;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -20,14 +19,12 @@ use Symfony\Component\Validator\Constraints as Assert;
         new Get(
             denormalizationContext: ['groups' => ['lieu:create', 'lieu:update']]
         ),
-        new GetCollection(
-            denormalizationContext: ['groups' => ['lieu:create', 'lieu:update']],
-            provider: PhotoProvider::class
-        ),
+        new GetCollection(),
         new Post(inputFormats: ['multipart' => ['multipart/form-data']]
-        )
+        ),
+        new Delete()
     ],
-    normalizationContext: ['groups' => ['lieu:read', 'sortie:read']],
+    normalizationContext: ['groups' => ['lieu:read']],
 )]
 class Lieu
 {
@@ -48,7 +45,7 @@ class Lieu
     private ?string $description = null;
 
     #[ORM\Column(type: "blob", nullable: true)]
-    #[Groups(["lieu:read", "sortie:read", "sortie:read", "lieu:create"])]
+    #[Groups(["lieu:read", "sortie:read", "lieu:create", "lieu:update"])]
     private $photo;
 
     #[ORM\Column(length: 512)]
