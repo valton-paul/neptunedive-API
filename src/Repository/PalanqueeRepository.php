@@ -26,7 +26,7 @@ class PalanqueeRepository extends EntityRepository
             SELECT sortie_id, ap.plongeur_id, encadrant_id,
                    pl.nom, pl.prenom,
                    duree_prevue, duree_realisee, profondeur_prevue,
-                   profondeur_realisee, type, date_sortie, lieu, creneau
+                   profondeur_realisee, type, date_sortie, s.id_lieu_id, s.heure_sortie
             FROM palanquee p
             JOIN assignation_palanquee ap ON p.id = ap.palanquee_id
             JOIN sortie s on p.sortie_id = s.id
@@ -54,7 +54,7 @@ class PalanqueeRepository extends EntityRepository
             SELECT sortie_id, ap.plongeur_id, encadrant_id,
                    pl.nom, pl.prenom,
                    duree_prevue, duree_realisee, profondeur_prevue,
-                   profondeur_realisee, type, date_sortie, lieu, creneau
+                   profondeur_realisee, type, date_sortie, s.id_lieu_id, s.heure_sortie
             FROM palanquee p
             JOIN assignation_palanquee ap ON p.id = ap.palanquee_id
             JOIN sortie s on p.sortie_id = s.id
