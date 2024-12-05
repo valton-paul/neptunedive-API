@@ -56,7 +56,7 @@ class DonneeClubManager implements DonneeClubManagerInterface
     function getDonneeClub(): DonneeClub
     {
         $donneeClubBD = $this->donneeClubRepository->findAll();
-        if (empty($donneeClubBD)) {
+        if (empty($donneeClubBD) || !$donneeClubBD[0]->getEmailSpond()) {
             throw new NotFoundException('No credentials found');
         }
         return $donneeClubBD[0];
