@@ -339,7 +339,6 @@ class Sortie
     public function setHeureSortie(string $heureSortie): static
     {
         $this->heureSortie = $heureSortie;
-
         return $this;
     }
 
@@ -357,7 +356,6 @@ class Sortie
         $this->price = $price;
         return $this;
     }
-
 
     public function getIdSpond(): ?string
     {

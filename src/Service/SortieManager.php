@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Entity\InscriptionSortie;
+use App\Entity\Lieu;
 use App\Entity\Plongeur;
 use App\Entity\Sortie;
 use App\Enum\Creneaux;
@@ -10,7 +11,9 @@ use App\Exception\AlreadyExistsException;
 use App\Exception\MemberNotFoundException;
 use App\Exception\NotAllowedException;
 use App\Exception\NotFoundException;
+use App\Repository\LieuRepository;
 use App\Repository\SortieRepository;
+use Cassandra\Date;
 use DateException;
 use DateTime;
 use Doctrine\ORM\Exception\ORMException;
@@ -25,7 +28,8 @@ class SortieManager implements SortieManagerInterface
     public function __construct(
         private DatabaseContextResolver $provider,
         private Security $security,
-        private SortieRepository $sortieRepository
+        private SortieRepository $sortieRepository,
+        private LieuRepository $lieuRepository
     )
     {
         $this->entityManager = $this->provider->getEntityManager();
@@ -159,17 +163,11 @@ class SortieManager implements SortieManagerInterface
             // Associe les données aux en-têtes
             $row = array_combine($headers, $data);
             if (!$this->sortieRepository->findOneBy(['idSpond' => $row['ID']])) {
-                $heure = new \DateTime($row['Heure'] ?? null);
-                if ($heure < new \DateTime('12:00')) {
-                    $creneau = Creneaux::MATIN;
-                } else {
-                    $creneau = Creneaux::APRES_MIDI;
-                }
                 $sortieJson = [
                     'idSpond' => $row['ID'] ?? null,
                     'lieu' => $row['Lieu'] ?? null,
                     'dateSortie' => $row['Date'] ?? null,
-                    'creneau' => $creneau,
+                    'heure_sortie' => $row['Heure'] ?? null,
                     'participants' => explode(',', $row['Participants'])
                 ];
                 $sortiesJson[] = $sortieJson;
@@ -185,16 +183,19 @@ class SortieManager implements SortieManagerInterface
     {
         $newSortie = new Sortie();
         $newSortie->setIdSpond($idSpondSortie);
-        $newSortie->setLieu($sortie['lieu']);
+        $lieu = $this->lieuRepository->findOneBy(['nomLieu' => $sortie['lieu']]);
+        $lieu ? $newSortie->setIdLieu($lieu) :
+            $lieu = new Lieu();
+            $lieu->setNomLieu($sortie['lieu']);
+            $lieu->setLienMaps("https://www.google.com/maps/place/" . $sortie['lieu']);
+            $this->entityManager->persist($lieu);
+            $newSortie->setIdLieu($lieu);
         $newSortie->setType("Mer");
         $newSortie->setDirecteurPlongee($this->security->getUser());
         $newSortie->setSecuriteSurface($this->security->getUser());
         $newSortie->setDateSortie(new DateTime($sortie['dateSortie']));
-        if ($sortie['creneau'] === 'matin') {
-            $newSortie->setCreneau(Creneaux::MATIN);
-        } else {
-            $newSortie->setCreneau(Creneaux::APRES_MIDI);
-        }
+        $newSortie->setHeureSortie($sortie['heure_sortie']);
+        $newSortie->setNbMaxInscription(count($sortie['participants']));
         $this->entityManager->persist($newSortie);
         $this->entityManager->flush();
         return $newSortie;

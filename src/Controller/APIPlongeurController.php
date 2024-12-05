@@ -17,6 +17,7 @@ use App\Service\DonneeClubManagerInterface;
 use App\Service\SortieManagerInterface;
 use App\Service\UtilisateurManagerInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Exception\ORMException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -28,11 +29,11 @@ class APIPlongeurController extends AbstractController
 {
 
     public function __construct(
-        private PalanqueeRepository         $palanqueeRepository,
-        private readonly PlongeurRepository $plongeurRepository,
-        private DonneeClubManagerInterface $donneeClubManager,
-        private SortieManagerInterface $sortieManager,
-        private UtilisateurManagerInterface $utilisateurManager,
+        private readonly PalanqueeRepository         $palanqueeRepository,
+        private readonly PlongeurRepository          $plongeurRepository,
+        private readonly DonneeClubManagerInterface  $donneeClubManager,
+        private readonly SortieManagerInterface      $sortieManager,
+        private readonly UtilisateurManagerInterface $utilisateurManager,
     )
     {
 
@@ -62,20 +63,6 @@ class APIPlongeurController extends AbstractController
     }
 
 
-    /*
-     * Problemes :
-     *
-     * Probleme si une personne est inscrite sur spond et pas sur neptuneDive
-     *
-     * TODO :
-     * DONE : Page pour mettre ses identifiants spond et le nom du groupe spond
-     * DONE : Faire une requete pour trouver l'id du groupe spond
-     * DONE : Faire un bouton pour lancer le script et importer une/des sorties (avec un form pour choisir la date ou la date du jour ?)
-     * DONE : Faire la requete pour recuperer les sorties
-     * DONE : Faire la requete pour recuperer les plongeurs inscrits a une sortie
-     */
-
-
     #[Route('/sorties/{idSpondSortie}/spond', name: 'api_sortie_spond', methods: ['POST'])]
     #[IsGranted('ROLE_MONITEUR')]
     public function importSortieSpond($idSpondSortie, Request $request): JsonResponse
@@ -93,6 +80,8 @@ class APIPlongeurController extends AbstractController
             return new JsonResponse(['message' => 'Sortie importée avec succès']);
         } catch (\Exception $e) {
             return new JsonResponse(['error' => $e->getMessage()], 500);
+        } catch (ORMException $e) {
+            return new JsonResponse(['error' => $e->getMessage()], 500);
         }
     }
 
@@ -100,13 +89,12 @@ class APIPlongeurController extends AbstractController
     #[IsGranted('ROLE_MONITEUR')]
     public function getSortiesSpond(): JsonResponse
     {
-        $donneeClub = $this->donneeClubManager->getDonneeClub();
-        $username = $donneeClub->getEmailSpond();
-        $password = $donneeClub->getPasswordSpond();
-        $password = $this->donneeClubManager->decryptPassword($password);
-        $groupId = $donneeClub->getGroupIdSpond();
-
         try {
+            $donneeClub = $this->donneeClubManager->getDonneeClub();
+            $username = $donneeClub->getEmailSpond();
+            $password = $donneeClub->getPasswordSpond();
+            $password = $this->donneeClubManager->decryptPassword($password);
+            $groupId = $donneeClub->getGroupIdSpond();
             $sortiesJson = $this->sortieManager->getSortiesSpond($username, $password, $groupId);
             return new JsonResponse($sortiesJson);
         } catch (NotFoundException $e) {
