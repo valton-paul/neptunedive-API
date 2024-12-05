@@ -21,6 +21,7 @@ interface DonneeClubManagerInterface
 
     /**
      * @return DonneeClub
+     * @throws NotFoundException
      */
     function getDonneeClub(): DonneeClub;
 
