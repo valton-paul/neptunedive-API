@@ -17,7 +17,7 @@ class PalanqueeRepository extends EntityRepository
     {
         parent::__construct($em, $em->getClassMetadata(Palanquee::class));
     }
-
+    //Il se débrouille de mieux en mieux, mais il a toujours du mal à mettre ses palmes et son masque.
     public function findPalanqueesWithoutCommentsForEncadrant(int $encadrantId): array
     {
         $conn = $this->getEntityManager()->getConnection();
@@ -26,11 +26,12 @@ class PalanqueeRepository extends EntityRepository
             SELECT sortie_id, ap.plongeur_id, encadrant_id,
                    pl.nom, pl.prenom,
                    duree_prevue, duree_realisee, profondeur_prevue,
-                   profondeur_realisee, type, date_sortie, s.id_lieu_id, s.heure_sortie
+                   profondeur_realisee, type, date_sortie, nom_lieu, s.heure_sortie
             FROM palanquee p
             JOIN assignation_palanquee ap ON p.id = ap.palanquee_id
             JOIN sortie s on p.sortie_id = s.id
             JOIN plongeur pl on ap.plongeur_id = pl.id
+            JOIN lieu l on s.id_lieu_id = l.id
             WHERE p.encadrant_id = :encadrantId 
               AND NOT EXISTS (
                 SELECT 1 

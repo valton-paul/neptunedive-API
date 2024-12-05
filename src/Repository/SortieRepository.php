@@ -1,6 +1,8 @@
 <?php
 
+
 namespace App\Repository;
+ini_set('memory_limit', '1900M');
 
 use App\Entity\Sortie;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
