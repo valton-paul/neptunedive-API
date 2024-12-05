@@ -355,6 +355,8 @@ class Sortie
     public function setPrice(?float $price): static
     {
         $this->price = $price;
+        return $this;
+    }
 
 
     public function getIdSpond(): ?string

@@ -30,7 +30,6 @@ class APIPlongeurController extends AbstractController
     public function __construct(
         private PalanqueeRepository         $palanqueeRepository,
         private readonly PlongeurRepository $plongeurRepository,
-        private PalanqueeRepository $palanqueeRepository,
         private DonneeClubManagerInterface $donneeClubManager,
         private SortieManagerInterface $sortieManager,
         private UtilisateurManagerInterface $utilisateurManager,
@@ -61,7 +60,6 @@ class APIPlongeurController extends AbstractController
         $plongeurs = $this->plongeurRepository->getAllHasNotPaidASortie();
         return $this->json($plongeurs);
     }
-}
 
 
     /*
