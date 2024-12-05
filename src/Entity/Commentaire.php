@@ -43,7 +43,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
                 ),
             ],
             description: "Récupère les commentaires d'un plongeur.",
-            normalizationContext: ["groups" => ["commentaire:read", "plongeur:read", "sortie:read"]],
+            normalizationContext: ["groups" => ["commentaire:read", "plongeur:read", "commentaire:sortie:read"]],
         )
     ],
     normalizationContext: ["groups" => ["commentaire:read"]],

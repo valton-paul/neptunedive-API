@@ -7,7 +7,11 @@ use App\Entity\Sortie;
 use App\Exception\AlreadyExistsException;
 use App\Exception\MemberNotFoundException;
 use App\Exception\NotAllowedException;
+use App\Exception\NotFoundException;
 use DateException;
+use Doctrine\ORM\Exception\ORMException;
+use Doctrine\ORM\OptimisticLockException;
+use Exception;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -59,6 +63,25 @@ interface SortieManagerInterface
      */
     function cancel(Sortie $sortie): void;
 
+    /**
+     * @param $username
+     * @param $password
+     * @param $idGroupe
+     * @return array
+     * @throws Exception
+     * @throws NotFoundException
+     */
+    function getSortiesSpond($username, $password, $idGroupe): array;
+
+    /**
+     * @param array $sortie
+     * @param $idSpondSortie
+     * @return Sortie
+     * @throws \DateMalformedStringException
+     * @throws OptimisticLockException
+     * @throws ORMException
+     */
+    function processNewArray(array $sortie, $idSpondSortie): Sortie;
 
 
 }

@@ -19,4 +19,6 @@ interface UtilisateurManagerInterface
      */
     function makeSupervisor(Plongeur $plongeur, NiveauMoniteur $niveauMoniteur): Plongeur;
     function revokeSupervisor(Plongeur $plongeur): Plongeur;
+
+    function getPlongeurByLastnameAndFirstname(string $nom, string $prenom): Plongeur|null;
 }

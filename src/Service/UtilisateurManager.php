@@ -74,7 +74,14 @@ class UtilisateurManager implements UtilisateurManagerInterface
     function revokeSupervisor(Plongeur $plongeur): Plongeur
     {
         $plongeur->setMoniteur(false);
+        $plongeur->setNiveauMoniteur(NiveauMoniteur::NONE);
         $this->entityManager->flush();
         return $plongeur;
+    }
+
+
+    function getPlongeurByLastnameAndFirstname(string $nom, string $prenom): Plongeur|null
+    {
+        return $this->plongeurRepository->findOneBy(['nom' => $nom, 'prenom' => $prenom]);
     }
 }

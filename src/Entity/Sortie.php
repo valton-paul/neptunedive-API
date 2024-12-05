@@ -84,7 +84,7 @@ class Sortie
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['sortie:read', 'inscriptionSortie:sortie:read'])]
+    #[Groups(['sortie:read', 'inscriptionSortie:sortie:read', "commentaire:sortie:read"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 100)]
@@ -157,6 +157,10 @@ class Sortie
     #[ORM\Column(nullable: true)]
     #[Groups(['sortie:read', 'inscriptionSortie:sortie:read'])]
     private ?float $price = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?string $idSpond = null;
+
 
     public function __construct()
     {
@@ -352,6 +356,15 @@ class Sortie
     {
         $this->price = $price;
 
+
+    public function getIdSpond(): ?string
+    {
+        return $this->idSpond;
+    }
+
+    public function setIdSpond(?string $idSpond): static
+    {
+        $this->idSpond = $idSpond;
         return $this;
     }
 }
