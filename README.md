@@ -49,7 +49,7 @@ Attendez que le conteneur ce lance, et passez à la suite.
 
 ### 3. Accéder à l'application
 
-Vous pouvez utiliser l'application via l'URL suivante [http://localhost:5173](http://localhost:5173)
+Vous pouvez utiliser l'application via l'URL suivante [http://localhost:5173/login](http://localhost:5173/login)
 
 __Voici deux comptes pré-inscrits :__
 
