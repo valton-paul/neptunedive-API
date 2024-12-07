@@ -34,23 +34,22 @@ Ouvrez un terminal dans le dossier parent des deux projets (neptunedive et neptu
 Une fois dans le répertoire parent, exécutez les commandes suivantes (si vous avez pas git clone les noms des dossiers seront neptunedive-13-client-docker-compose ou neptunedivefront-13-client-docker-compose):
 
 ```bash
-cd neptunedive &&
+cd neptunedivefront &&
 docker network create shared_network &&
 docker compose up --build -d
 ```
 
-Une fois que le conteneur du backend est lancé, passons au docker du frontend :
+Une fois que le conteneur du backend est lancé, passons au docker du backend :
 
 ```bash
-cd ../neptunedivefront &&
-docker compose up --build -d
+cd ../neptunedive &&
+docker compose up --build
 ```
+Attendez que le conteneur ce lance, et passez à la suite.
 
 ### 3. Accéder à l'application
 
 Vous pouvez utiliser l'application via l'URL suivante [http://localhost:5173](http://localhost:5173)
-
-(Si le site n'est pas trouvé, merci d'attendre la fin du chargement des dockers)
 
 __Voici deux comptes pré-inscrits :__
 
