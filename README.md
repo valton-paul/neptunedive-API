@@ -50,6 +50,8 @@ docker compose up --build -d
 
 Vous pouvez utiliser l'application via l'URL suivante [http://localhost:5173](http://localhost:5173)
 
+(Si le site n'est pas trouvé, merci d'attendre la fin du chargement des dockers)
+
 __Voici deux comptes pré-inscrits :__
 
 Un simple plongeur : 
