@@ -48,7 +48,7 @@ docker compose up --build -d
 
 ### 3. Accéder à l'application
 
-Vous pouvez utiliser l'application via l'URL suivante [http://tenant2.localhost:5173](http://tenant2.localhost:5173)
+Vous pouvez utiliser l'application via l'URL suivante [http://localhost:5173](http://localhost:5173)
 
 __Voici deux comptes pré-inscrits :__
 
