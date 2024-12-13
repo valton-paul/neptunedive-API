@@ -54,6 +54,13 @@ class DonneeClub
     #[ApiProperty(readable: false)]
     private ?string $plainPasswordSpond = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['donnee_club:read'])]
+    private ?string $helloAssoClientId = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $helloAssoClientSecret = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -120,6 +127,30 @@ class DonneeClub
     public function setGroupIdSpond(?string $groupIdSpond): static
     {
         $this->groupIdSpond = $groupIdSpond;
+
+        return $this;
+    }
+
+    public function getHelloAssoClientId(): ?string
+    {
+        return $this->helloAssoClientId;
+    }
+
+    public function setHelloAssoClientId(?string $helloAssoClientId): static
+    {
+        $this->helloAssoClientId = $helloAssoClientId;
+
+        return $this;
+    }
+
+    public function getHelloAssoClientSecret(): ?string
+    {
+        return $this->helloAssoClientSecret;
+    }
+
+    public function setHelloAssoClientSecret(?string $helloAssoClientSecret): static
+    {
+        $this->helloAssoClientSecret = $helloAssoClientSecret;
 
         return $this;
     }

@@ -14,23 +14,33 @@ class HelloAssoTokenManager
     private string $refreshTokenUrl;
 
     public function __construct(
-        private HttpClientInterface                           $httpClient,
-        private CacheItemPoolInterface                        $cache,
-        #[Autowire('%helloAssoClientId%')] private string     $clientId,
-        #[Autowire('%helloAssoClientSecret%')] private string $clientSecret,
-        #[Autowire('%helloAssoApiUrl%')] private string       $apiBaseUrl,
+        private HttpClientInterface                     $httpClient,
+        private CacheItemPoolInterface                  $cache,
+        private DonneeClubManager                       $clubManager,
+        #[Autowire('%helloAssoApiUrl%')] private string $apiBaseUrl,
     )
     {
         $this->refreshTokenUrl = $this->apiBaseUrl . '/oauth2/token';
     }
 
+    private function getTokenCacheKey(): string
+    {
+        return self::TOKEN_CACHE_KEY . '_' . $this->clubManager->getDonneeClub()->getHelloAssoClientId();
+    }
+
+    private function getRefreshTokenCacheKey(): string
+    {
+        return self::REFRESH_TOKEN_CACHE_KEY . '_' . $this->clubManager->getDonneeClub()->getHelloAssoClientId();
+    }
+
+
     public function getToken(): string
     {
-        $token = $this->cache->getItem(self::TOKEN_CACHE_KEY);
+        $token = $this->cache->getItem($this->getTokenCacheKey());
 
         if (!$token->isHit()) {
             $this->refreshToken();
-            $token = $this->cache->getItem(self::TOKEN_CACHE_KEY);
+            $token = $this->cache->getItem($this->getTokenCacheKey());
         }
 
         return $token->get();
@@ -43,8 +53,8 @@ class HelloAssoTokenManager
                 'Content-Type' => 'application/x-www-form-urlencoded',
             ],
             'body' => [
-                'client_id' => $this->clientId,
-                'client_secret' => $this->clientSecret,
+                'client_id' => $this->clubManager->getDonneeClub()->getHelloAssoClientId(),
+                'client_secret' => $this->clubManager->getDonneeClub()->getHelloAssoClientSecret(),
                 'grant_type' => 'client_credentials',
             ],
         ]);
@@ -60,7 +70,7 @@ class HelloAssoTokenManager
 
     private function refreshToken(): void
     {
-        $refreshToken = $this->cache->getItem(self::REFRESH_TOKEN_CACHE_KEY);
+        $refreshToken = $this->cache->getItem($this->getRefreshTokenCacheKey());
         if (!$refreshToken->isHit()) {
             // Si aucun refresh token n'est présent, réinitialiser le token
             $this->initializeToken();
@@ -74,8 +84,8 @@ class HelloAssoTokenManager
             'body' => [
                 'grant_type' => 'refresh_token',
                 'refresh_token' => $refreshToken->get(),
-                'client_id' => $this->clientId,
-                'client_secret' => $this->clientSecret,
+                'client_id' => $this->clubManager->getDonneeClub()->getHelloAssoClientId(),
+                'client_secret' => $this->clubManager->getDonneeClub()->getHelloAssoClientSecret(),
             ],
         ]);
 
@@ -89,12 +99,12 @@ class HelloAssoTokenManager
 
     private function storeToken(string $accessToken, string $refreshToken, int $expiresIn): void
     {
-        $tokenItem = $this->cache->getItem(self::TOKEN_CACHE_KEY);
+        $tokenItem = $this->cache->getItem($this->getTokenCacheKey());
         $tokenItem->set($accessToken);
         $tokenItem->expiresAfter($expiresIn - 60); // Buffer of 1 minute
         $this->cache->save($tokenItem);
 
-        $refreshTokenItem = $this->cache->getItem(self::REFRESH_TOKEN_CACHE_KEY);
+        $refreshTokenItem = $this->cache->getItem($this->getRefreshTokenCacheKey());
         $refreshTokenItem->set($refreshToken);
         $this->cache->save($refreshTokenItem);
     }

@@ -115,7 +115,7 @@ class APIPlongeurController extends AbstractController
         $groupName = $data['groupNameSpond'];
 
         try {
-            $groupID = $this->donneeClubManager->findGroupIdSpond($username, $password, $groupName);
+            $groupID = "5"; //$this->donneeClubManager->findGroupIdSpond($username, $password, $groupName);
             return new JsonResponse(['groupId' => $groupID]);
         } catch (NotFoundException $e) {
             return new JsonResponse(['error' => $e->getMessage()], Response::HTTP_NOT_FOUND);
