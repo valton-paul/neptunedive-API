@@ -14,6 +14,7 @@ use App\Repository\SortieRepository;
 use App\State\Plongeur\PlongeurSortiesHistoriqueProvider;
 use App\State\Plongeur\PlongeurSortiesNotEnrolledProvider;
 use App\State\Plongeur\PlongeurSortiesProvider;
+use App\State\Sortie\PostSortieProcessor;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -31,6 +32,7 @@ use Symfony\Component\Validator\Constraints\NotNull;
             denormalizationContext: ["groups" => ["sortie:create"]],
             security: "is_granted('ROLE_MONITEUR')",
             validationContext: ["groups" => ["Default", "sortie:create"]],
+            processor: PostSortieProcessor::class
         ),
         new Patch(
             denormalizationContext: ["groups" => ["sortie:update"]],
@@ -155,7 +157,7 @@ class Sortie
      * @var float|null Price in euros
      */
     #[ORM\Column(nullable: true)]
-    #[Groups(['sortie:read', 'inscriptionSortie:sortie:read'])]
+    #[Groups(['sortie:read', 'inscriptionSortie:sortie:read', 'sortie:create', "sortie:update"])]
     private ?float $price = null;
 
     #[ORM\Column(nullable: true)]
