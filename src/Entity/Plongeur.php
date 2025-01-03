@@ -141,7 +141,7 @@ class Plongeur implements UserInterface, PasswordAuthenticatedUserInterface
     private ?bool $formation = null;
 
     #[ORM\Column(type: 'integer', nullable: true, enumType: NiveauPlongeeAutonome::class)]
-    #[Groups(["plongeur:read", "plongeur:create", "plongeur:update"])]
+    #[Groups(["plongeur:read", "plongeur:create", "plongeur:update", 'inscriptionSortie:plongeur:read'])]
     private ?NiveauPlongeeAutonome $niveauPlongeeAutonome = null;
 
     /**
@@ -151,12 +151,12 @@ class Plongeur implements UserInterface, PasswordAuthenticatedUserInterface
     private Collection $commentaires;
 
     #[ORM\Column(type: 'integer', nullable: true, enumType: NiveauPlongeeEncadre::class)]
-    #[Groups(["plongeur:read","plongeur:create", "plongeur:update"])]
+    #[Groups(["plongeur:read","plongeur:create", "plongeur:update", 'inscriptionSortie:plongeur:read'])]
     private ?NiveauPlongeeEncadre $niveauPlongeeEncadre = null;
 
 
     #[ORM\Column(type: 'string', length: 25, enumType: NiveauMoniteur::class)]
-    #[Groups(["plongeur:read","plongeur:update"])]
+    #[Groups(["plongeur:read","plongeur:update", 'inscriptionSortie:plongeur:read'])]
     private ?NiveauMoniteur $niveauMoniteur = null;
 
     /**
