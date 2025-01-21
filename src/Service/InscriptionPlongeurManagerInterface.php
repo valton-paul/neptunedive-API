@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\DTO\CreateInscriptionInput;
 use App\Entity\InscriptionPlongeur;
 use App\Entity\Plongeur;
 use App\Exception\AlreadyExistsException;
@@ -13,7 +14,7 @@ interface InscriptionPlongeurManagerInterface
      * @param InscriptionPlongeur $inscriptionPlongeur
      * @return void
      */
-    function processNewInscription(InscriptionPlongeur $inscriptionPlongeur): void;
+    function processNewInscription(CreateInscriptionInput $data): void;
 
     /**
      * @param InscriptionPlongeur $inscriptionPlongeur
@@ -26,7 +27,7 @@ interface InscriptionPlongeurManagerInterface
      * @param InscriptionPlongeur $inscriptionPlongeur
      * @param string $plainPassword
      * @return Plongeur nouvellement crée
-     * @throws NotAllowedException si la demande n'a pas été validée
+     * @throws NotAllowedException si la demande n'a pas été validée ou que le token n'est pas valide
      * @throws AlreadyExistsException si le plongeur existe déjà
      */
     function createPlongeurFromDemande(InscriptionPlongeur $inscriptionPlongeur, string $plainPassword): Plongeur;

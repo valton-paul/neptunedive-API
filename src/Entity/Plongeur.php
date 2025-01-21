@@ -21,6 +21,7 @@ use App\State\Sortie\SortieNotAssignedPlongeursProvider;
 use App\State\Sortie\SortiePlongeursProvider;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -196,6 +197,31 @@ class Plongeur implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: IgnoredSorties::class, mappedBy: 'plongeur')]
     #[Groups(["plongeur:read"])]
     private Collection $ignoredSorties;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(["plongeur:read"])]
+    private ?string $tailleStab = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(["plongeur:read"])]
+    private ?string $taillePalmes = null;
+
+    #[ORM\Column]
+    #[Groups(["plongeur:read"])]
+    private ?bool $possedeMasquePlongee = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(["plongeur:read"])]
+    private ?string $tailleCombinaison = null;
+
+    #[ORM\Column(type: Types::BLOB)]
+    private $photoDeProfil = null;
+
+    #[ORM\Column(type: Types::BLOB)]
+    private $carteNiveau = null;
+
+    #[ORM\Column(type: Types::BLOB)]
+    private $certificatMedical = null;
 
 
     public function __construct()
@@ -573,6 +599,90 @@ class Plongeur implements UserInterface, PasswordAuthenticatedUserInterface
                 $ignoredSorty->setPlongeur(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getTailleStab(): ?string
+    {
+        return $this->tailleStab;
+    }
+
+    public function setTailleStab(?string $tailleStab): static
+    {
+        $this->tailleStab = $tailleStab;
+
+        return $this;
+    }
+
+    public function getTaillePalmes(): ?string
+    {
+        return $this->taillePalmes;
+    }
+
+    public function setTaillePalmes(?string $taillePalmes): static
+    {
+        $this->taillePalmes = $taillePalmes;
+
+        return $this;
+    }
+
+    public function isPossedeMasquePlongee(): ?bool
+    {
+        return $this->possedeMasquePlongee;
+    }
+
+    public function setPossedeMasquePlongee(bool $possedeMasquePlongee): static
+    {
+        $this->possedeMasquePlongee = $possedeMasquePlongee;
+
+        return $this;
+    }
+
+    public function getTailleCombinaison(): ?string
+    {
+        return $this->tailleCombinaison;
+    }
+
+    public function setTailleCombinaison(?string $tailleCombinaison): static
+    {
+        $this->tailleCombinaison = $tailleCombinaison;
+
+        return $this;
+    }
+
+    public function getPhotoDeProfil()
+    {
+        return $this->photoDeProfil;
+    }
+
+    public function setPhotoDeProfil($photoDeProfil): static
+    {
+        $this->photoDeProfil = $photoDeProfil;
+
+        return $this;
+    }
+
+    public function getCarteNiveau()
+    {
+        return $this->carteNiveau;
+    }
+
+    public function setCarteNiveau($carteNiveau): static
+    {
+        $this->carteNiveau = $carteNiveau;
+
+        return $this;
+    }
+
+    public function getCertificatMedical()
+    {
+        return $this->certificatMedical;
+    }
+
+    public function setCertificatMedical($certificatMedical): static
+    {
+        $this->certificatMedical = $certificatMedical;
 
         return $this;
     }

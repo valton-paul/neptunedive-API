@@ -4,20 +4,21 @@ namespace App\State\InscriptionPlongeur;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
+use App\DTO\CreateInscriptionInput;
 use App\DTO\FinalizeInscriptionInput;
 use App\Exception\NotAllowedException;
 use App\Repository\InscriptionPlongeurRepository;
 use App\Service\InscriptionPlongeurManager;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class InscriptionPlongeurProcessor implements ProcessorInterface
 {
     public function __construct(
         #[Autowire(service: 'api_platform.doctrine.orm.state.persist_processor')]
-        private ProcessorInterface         $persistProcessor,
-        private InscriptionPlongeurManager $inscriptionPlongeurManager,
-        private InscriptionPlongeurRepository $inscriptionPlongeurRepository
-    )
+        private ProcessorInterface            $persistProcessor,
+        private InscriptionPlongeurManager    $inscriptionPlongeurManager,
+        private InscriptionPlongeurRepository $inscriptionPlongeurRepository)
     {
     }
 
@@ -46,6 +47,10 @@ class InscriptionPlongeurProcessor implements ProcessorInterface
         }
 
         if ($operation->getName() == 'create_inscription') {
+            if (!$data instanceof CreateInscriptionInput) {
+                throw new \InvalidArgumentException('Les données envoyées sont invalides.');
+            }
+
             $this->inscriptionPlongeurManager->processNewInscription($data);
         }
         return $this->persistProcessor->process($data, $operation, $uriVariables, $context);
