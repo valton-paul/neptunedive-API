@@ -128,13 +128,10 @@ class AddTenantCommand extends Command
 
     private function makeMigration(string $tenantName, OutputInterface $output): void
     {
-        // Définir la commande pour générer les migrations
         $command = 'php bin/console doctrine:migrations:diff --env=' . $tenantName . ' --no-interaction';
 
-        // Exécuter la commande et récupérer la sortie
         $outputBuffer = shell_exec($command);
 
-        // Vérifier si la sortie indique qu'aucun changement n'a été détecté
         if (strpos($outputBuffer, 'No changes detected') !== false) {
             $output->writeln('<info>Aucun changement de schéma détecté, aucune migration à générer.</info>');
         } else {
