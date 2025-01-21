@@ -192,15 +192,19 @@ class Plongeur implements UserInterface, PasswordAuthenticatedUserInterface
     private Collection $assignationPalanquees;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(["plongeur:read"])]
     private ?string $tailleStab = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(["plongeur:read"])]
     private ?string $taillePalmes = null;
 
     #[ORM\Column]
+    #[Groups(["plongeur:read"])]
     private ?bool $possedeMasquePlongee = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(["plongeur:read"])]
     private ?string $tailleCombinaison = null;
 
     #[ORM\Column(type: Types::BLOB)]
