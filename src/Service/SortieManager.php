@@ -6,33 +6,31 @@ use App\Entity\InscriptionSortie;
 use App\Entity\Lieu;
 use App\Entity\Plongeur;
 use App\Entity\Sortie;
-use App\Enum\Creneaux;
 use App\Exception\AlreadyExistsException;
 use App\Exception\MemberNotFoundException;
 use App\Exception\NotAllowedException;
 use App\Exception\NotFoundException;
 use App\Repository\LieuRepository;
 use App\Repository\SortieRepository;
-use Cassandra\Date;
 use DateException;
 use DateTime;
-use Doctrine\ORM\Exception\ORMException;
-use Doctrine\ORM\OptimisticLockException;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\FormInterface;
 
 class SortieManager implements SortieManagerInterface
 {
-    private $entityManager;
+
 
     public function __construct(
-        private DatabaseContextResolver $provider,
+        private EntityManagerInterface $entityManager,
         private Security $security,
         private SortieRepository $sortieRepository,
-        private LieuRepository $lieuRepository
+        private LieuRepository $lieuRepository,
+        private DonneeClubManagerInterface $donneeClubManager,
+        private UtilisateurManagerInterface $utilisateurManager
     )
     {
-        $this->entityManager = $this->provider->getEntityManager();
     }
 
     /**
@@ -138,9 +136,9 @@ class SortieManager implements SortieManagerInterface
     {
         $scriptPath = __DIR__ . '/../ScriptPython/spondScript.py';
 
-        exec("python3 $scriptPath --username $username --password $password --group_id $idGroupe", $csvFilePath);
+        exec("/opt/venv/bin/python3 $scriptPath --username $username --password $password --group_id $idGroupe", $csvFilePath);
 
-        if ($csvFilePath === []) {
+        if ($csvFilePath[0] === "Aucun événement trouvé.") {
             throw new NotFoundException('Aucune sortie trouvée');
         }
 
@@ -179,7 +177,21 @@ class SortieManager implements SortieManagerInterface
     }
 
 
-    function processNewArray(array $sortie, $idSpondSortie): Sortie
+    function importAllSortie(array $sorties = null): void
+    {
+        if (!$sorties) {
+            $donneeClub = $this->donneeClubManager->getDonneeClub();
+            $username = $donneeClub->getEmailSpond();
+            $password = $this->donneeClubManager->decryptPassword($donneeClub->getPasswordSpond());
+            $groupId = $donneeClub->getGroupIdSpond();
+            $sorties = $this->getSortiesSpond($username, $password, $groupId);
+        }
+        foreach ($sorties as $sortie) {
+            $this->processNewFromArray($sortie, $sortie['idSpond']);
+        }
+    }
+
+    function processNewFromArray(array $sortie, $idSpondSortie): void
     {
         $newSortie = new Sortie();
         $newSortie->setIdSpond($idSpondSortie);
@@ -191,13 +203,57 @@ class SortieManager implements SortieManagerInterface
             $this->entityManager->persist($lieu);
             $newSortie->setIdLieu($lieu);
         $newSortie->setType("Mer");
-        $newSortie->setDirecteurPlongee($this->security->getUser());
-        $newSortie->setSecuriteSurface($this->security->getUser());
+        $admin = $this->utilisateurManager->getPlongeurAdmin();
+        $newSortie->setDirecteurPlongee($admin);
+        $newSortie->setSecuriteSurface($admin);
         $newSortie->setDateSortie(new DateTime($sortie['dateSortie']));
         $newSortie->setHeureSortie($sortie['heure_sortie']);
         $newSortie->setNbMaxInscription(count($sortie['participants']));
         $this->entityManager->persist($newSortie);
         $this->entityManager->flush();
-        return $newSortie;
+        foreach ($sortie['participants'] as $plongeurName) {
+            $plongeurName = explode(' ', trim($plongeurName));
+            $plongeur = $this->utilisateurManager->getPlongeurByLastnameAndFirstname(trim($plongeurName[1]), trim($plongeurName[0]));
+            if ($plongeur) {
+                $this->signUpFor($plongeur, $newSortie);
+            }
+        }
     }
+
+    // Exemple d'une fonction Symfony qui met à jour le fichier cron
+    public function updateCronJob($intervalle)
+    {
+        $cronFile = '/etc/cron.d/spond-cron-job';
+
+        // Supprimer l'ancien job cron
+        exec('crontab -r');
+
+        // Définir un nouveau job cron selon l'intervalle
+        $cronJob = $this->generateCronJob($intervalle);
+
+        // Sauvegarder la nouvelle tâche cron dans le fichier
+        file_put_contents($cronFile, $cronJob);
+
+        // Appliquer la nouvelle configuration de cron
+        exec('crontab ' . $cronFile);
+    }
+
+    private function generateCronJob($intervalle)
+    {
+        $cronTime = match ($intervalle) {
+            '2day' => '0 0 */2 * *',
+            '3day' => '0 0 */3 * *',
+            '4day' => '0 0 */4 * *',
+            '5day' => '0 0 */5 * *',
+            '6day' => '0 0 */6 * *',
+            '1week' => '0 0 * * 0',
+            '1month' => '0 0 1 * *',
+            default => '0 0 * * *',
+        };
+        return "$cronTime /usr/local/bin/php /var/www/html/neptunedive/bin/console c:iae >> /var/www/html/cron.log 2>&1; echo 'Cron job executed' >> /var/www/html/cron.log\n";
+    }
+
+
+
+
 }

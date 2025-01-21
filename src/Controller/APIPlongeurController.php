@@ -69,14 +69,7 @@ class APIPlongeurController extends AbstractController
     {
         try {
             $data = $request->toArray();
-            $sortie = $this->sortieManager->processNewArray($data, $idSpondSortie);
-            foreach ($data['participants'] as $plongeurName) {
-                $plongeurName = explode(' ', trim($plongeurName));
-                $plongeur = $this->utilisateurManager->getPlongeurByLastnameAndFirstname(trim($plongeurName[1]), trim($plongeurName[0]));
-                if ($plongeur) {
-                    $this->sortieManager->signUpFor($plongeur, $sortie);
-                }
-            }
+            $this->sortieManager->processNewFromArray($data, $idSpondSortie);
             return new JsonResponse(['message' => 'Sortie importée avec succès']);
         } catch (\Exception $e) {
             return new JsonResponse(['error' => $e->getMessage()], 500);
@@ -123,6 +116,27 @@ class APIPlongeurController extends AbstractController
             return new JsonResponse(['error' => 'Server error : ' . $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
+    }
+
+    #[Route('/sorties/spondCron', name: 'cron', methods: ['POST'])]
+    public function testCron(Request $request): JsonResponse {
+        try {
+            $this->sortieManager->updateCronJob($request->toArray()['intervalle']);
+            return new JsonResponse(['message' => 'Cron job updated']);
+        } catch (\Exception $e) {
+            return new JsonResponse(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    #[Route('/sorties/spond', name: 'api_import_all', methods: ['POST'])]
+    #[IsGranted('ROLE_MONITEUR')]
+    public function importAllSortie(Request $request): JsonResponse {
+        try {
+            $this->sortieManager->importAllSortie($request->toArray());
+            return new JsonResponse(['message' => 'Sorties importées avec succès']);
+        } catch (\Exception $e) {
+            return new JsonResponse(['error' => $e->getMessage()], 500);
+        }
     }
 
 }

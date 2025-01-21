@@ -76,12 +76,21 @@ interface SortieManagerInterface
     /**
      * @param array $sortie
      * @param $idSpondSortie
-     * @return Sortie
      * @throws \DateMalformedStringException
      * @throws OptimisticLockException
      * @throws ORMException
      */
-    function processNewArray(array $sortie, $idSpondSortie): Sortie;
+    function processNewFromArray(array $sortie, $idSpondSortie): void;
+
+    /**
+     * @throws OptimisticLockException
+     * @throws \DateMalformedStringException
+     * @throws NotFoundException
+     * @throws ORMException
+     */
+    function importAllSortie(): void;
+
+    function updateCronJob($intervalle);
 
 
 }
