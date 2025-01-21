@@ -10,6 +10,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Dotenv\Dotenv;
 
 #[AsCommand(
     name: 'app:add-tenant',
@@ -28,19 +29,23 @@ class AddTenantCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $tenantName = $input->getArgument('tenantName');
+        $tenantName = trim($input->getArgument('tenantName'));
 
         if (!$this->isTenantNameValid($tenantName)) {
             $output->writeln('<error>Le nom du tenant contient des caractères invalides.</error>');
             return Command::FAILURE;
         }
 
+        $output->writeln('<info>.env creation...</info>');
         $this->createEnvFile($tenantName);
 
+        $output->writeln('<info>Apache configuration...</info>');
         $this->updateApacheConfig($tenantName);
 
         $this->createTenantDatabase($tenantName, $output);
 
+        $output->writeln("<info>Migrations running...</info>");
+        $this->makeMigration($tenantName, $output);
         $this->runMigrations($tenantName, $output);
 
         $output->writeln("<info>Le tenant '$tenantName' a été ajouté avec succès !</info>");
@@ -72,7 +77,7 @@ class AddTenantCommand extends Command
                 </VirtualHost>
             EOT;
 
-        $config .= "\n" . $configApache;
+        $config .= "\n" . "\n" . $configApache;
         file_put_contents($apacheConfigPath, $config);
     }
 
@@ -81,8 +86,8 @@ class AddTenantCommand extends Command
         $tenantEnvPath = __DIR__ . '/../../.env.' . $tenantName;
         $envContent =
             <<<EOT
-                APP_ENV=$tenantName
-                DATABASE_URL=mysql://root:root@db:3306/$tenantName
+            APP_ENV=$tenantName
+            DATABASE_URL=mysql://root:root@db:3306/$tenantName
             EOT;
 
         file_put_contents($tenantEnvPath, $envContent);
@@ -90,41 +95,56 @@ class AddTenantCommand extends Command
 
     private function createTenantDatabase(string $tenantName, OutputInterface $output): void
     {
+        $dotenv = new Dotenv();
+        $envFile = __DIR__ . '/../../.env.' . $tenantName;
+
+        if (!file_exists($envFile)) {
+            throw new \RuntimeException("Le fichier .env.$tenantName est introuvable.");
+        }
+
+        $dotenv->overload($envFile);
+
         $application = $this->getApplication();
         $command = $application->find('doctrine:database:create');
 
         $args = new ArrayInput([
+            '--if-not-exists' => true,
             '--env' => $tenantName,
         ]);
 
         $outputBuffer = new BufferedOutput();
         try {
-            $command->run($args, $outputBuffer);
+            $returnCode = $command->run($args, $outputBuffer);
         } catch (ExceptionInterface $e) {
             $output->writeln('<error>' . $e->getMessage() . '</error>');
         }
 
-        $output->writeln($outputBuffer->fetch());
-        $output->writeln("<info>Base de données pour '$tenantName' créée avec succès.</info>");
+        if ($returnCode === Command::SUCCESS) {
+            $output->writeln($outputBuffer->fetch());
+        } else {
+            $output->writeln("<error>Erreur lors de la création de la base de données pour '$tenantName'.</error>");
+        }
+    }
+
+    private function makeMigration(string $tenantName, OutputInterface $output): void
+    {
+        // Définir la commande pour générer les migrations
+        $command = 'php bin/console doctrine:migrations:diff --env=' . $tenantName . ' --no-interaction';
+
+        // Exécuter la commande et récupérer la sortie
+        $outputBuffer = shell_exec($command);
+
+        // Vérifier si la sortie indique qu'aucun changement n'a été détecté
+        if (strpos($outputBuffer, 'No changes detected') !== false) {
+            $output->writeln('<info>Aucun changement de schéma détecté, aucune migration à générer.</info>');
+        } else {
+            $output->writeln('<info>Migration générée avec succès pour le tenant \'' . $tenantName . '\'.</info>');
+        }
     }
 
     private function runMigrations(string $tenantName, OutputInterface $output): void
     {
-        $application = $this->getApplication();
-        $command = $application->find('doctrine:migrations:migrate');
-
-        $args = new ArrayInput([
-            '--env' => $tenantName,
-            '--no-interaction' => true,
-        ]);
-
-        $outputBuffer = new BufferedOutput();
-        try {
-            $command->run($args, $outputBuffer);
-        } catch (ExceptionInterface $e) {
-            $output->writeln('<error>' . $e->getMessage() . '</error>');
-        }
-
-        $output->writeln($outputBuffer->fetch());
+        $command = 'php bin/console doctrine:database:create --env=' . $tenantName . ' --no-interaction';
+        shell_exec($command);
     }
 }
