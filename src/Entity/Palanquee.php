@@ -70,19 +70,19 @@ class Palanquee
     private ?int $id = null;
 
     #[ORM\Column(type: Types::TIME_MUTABLE, nullable: true)]
-    #[Groups(['palanquee:read', 'palanquee:create', 'palanquee:update', 'assignationPalanquee:palanquee:read'])]
+    #[Groups(['palanquee:read', 'palanquee:create', 'palanquee:update', 'assignationPalanquee:palanquee:read', "sortie:read"])]
     private ?\DateTimeInterface $dureePrevue = null;
 
     #[ORM\Column(type: Types::TIME_MUTABLE, nullable: true)]
-    #[Groups(['palanquee:read', 'palanquee:create', 'palanquee:update', 'assignationPalanquee:palanquee:read'])]
+    #[Groups(['palanquee:read', 'palanquee:create', 'palanquee:update', 'assignationPalanquee:palanquee:read', "sortie:read"])]
     private ?\DateTimeInterface $dureeRealisee = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['palanquee:read', 'palanquee:create', 'palanquee:update', 'assignationPalanquee:palanquee:read'])]
+    #[Groups(['palanquee:read', 'palanquee:create', 'palanquee:update', 'assignationPalanquee:palanquee:read', "sortie:read"])]
     private ?int $profondeurPrevue = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['palanquee:read', 'palanquee:create', 'palanquee:update', 'assignationPalanquee:palanquee:read'])]
+    #[Groups(['palanquee:read', 'palanquee:create', 'palanquee:update', 'assignationPalanquee:palanquee:read', "sortie:read"])]
     private ?int $profondeurRealisee = null;
 
     #[ORM\ManyToOne(inversedBy: 'palanquees')]
@@ -94,7 +94,7 @@ class Palanquee
 
     #[ORM\ManyToOne(inversedBy: 'palanquees')]
     #[ORM\JoinColumn(nullable: true)]
-    #[Groups(['palanquee:read', 'palanquee:create', 'palanquee:update', 'assignationPalanquee:palanquee:read'])]
+    #[Groups(['palanquee:read', 'palanquee:create', 'palanquee:update', 'assignationPalanquee:palanquee:read', "sortie:read"])]
     private ?Plongeur $encadrant = null;
 
 
@@ -102,6 +102,7 @@ class Palanquee
      * @var Collection<int, AssignationPalanquee>
      */
     #[ORM\OneToMany(targetEntity: AssignationPalanquee::class, mappedBy: 'palanquee', cascade: ['persist'], orphanRemoval: true)]
+    #[Groups(["sortie:read"])]
     private Collection $plongeurAssignes;
 
     public function __construct()
