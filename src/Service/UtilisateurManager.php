@@ -81,4 +81,9 @@ class UtilisateurManager implements UtilisateurManagerInterface
     {
         return $this->plongeurRepository->findOneBy(['nom' => $nom, 'prenom' => $prenom]);
     }
+
+    function getPlongeurAdmin(): Plongeur|null
+    {
+        return $this->plongeurRepository->findByRoleAdmin()[0] ?? null;
+    }
 }

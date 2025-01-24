@@ -47,6 +47,7 @@ class PalanqueeDenormalizer implements DenormalizerInterface, DenormalizerAwareI
     {
         // Convertir le champ "sortie" contenant un ID simple en IRI
         if (isset($data['sortie'])) {
+
             $data['sortie'] = $this->iriConverter->getIriFromResource(resource: Sortie::class, context: ['uri_variables' => ['id' => $data['sortie']]]);
         }
 

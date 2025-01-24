@@ -21,4 +21,6 @@ interface UtilisateurManagerInterface
     function revokeSupervisor(Plongeur $plongeur): Plongeur;
 
     function getPlongeurByLastnameAndFirstname(string $nom, string $prenom): Plongeur|null;
+
+    function getPlongeurAdmin(): Plongeur|null;
 }

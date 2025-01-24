@@ -10,6 +10,7 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use App\Repository\DonneeClubRepository;
 use App\State\DonneeClub\DonneeClubProcessor;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
 
@@ -60,6 +61,12 @@ class DonneeClub
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $helloAssoClientSecret = null;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $lastSpondUpdateDate = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateInterval $intervalSpondUpdate = null;
 
     public function getId(): ?int
     {
@@ -151,6 +158,30 @@ class DonneeClub
     public function setHelloAssoClientSecret(?string $helloAssoClientSecret): static
     {
         $this->helloAssoClientSecret = $helloAssoClientSecret;
+
+        return $this;
+    }
+
+    public function getLastSpondUpdateDate(): ?\DateTimeInterface
+    {
+        return $this->lastSpondUpdateDate;
+    }
+
+    public function setLastSpondUpdateDate(?\DateTimeInterface $lastSpondUpdateDate): static
+    {
+        $this->lastSpondUpdateDate = $lastSpondUpdateDate;
+
+        return $this;
+    }
+
+    public function getIntervalSpondUpdate(): ?\DateInterval
+    {
+        return $this->intervalSpondUpdate;
+    }
+
+    public function setIntervalSpondUpdate(?\DateInterval $intervalSpondUpdate): static
+    {
+        $this->intervalSpondUpdate = $intervalSpondUpdate;
 
         return $this;
     }
