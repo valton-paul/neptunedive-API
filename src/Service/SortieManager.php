@@ -15,6 +15,8 @@ use App\Repository\SortieRepository;
 use DateException;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Exception\ORMException;
+use Doctrine\ORM\OptimisticLockException;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\FormInterface;
 
@@ -132,41 +134,42 @@ class SortieManager implements SortieManagerInterface
     }
 
 
-    function getSortiesSpond($username, $password, $idGroupe): array
+    function getSortiesSpond($username, $password, $idGroupe, $date): array
     {
         $scriptPath = __DIR__ . '/../ScriptPython/spondScript.py';
+        $escapedUsername = escapeshellarg($username);
+        $escapedPassword = escapeshellarg($password);
+        $escapedGroupID = escapeshellarg(trim($idGroupe));
 
-        exec("/opt/venv/bin/python3 $scriptPath --username $username --password $password --group_id $idGroupe", $csvFilePath);
+        if ($date){
+            $date = $date->format('Y-m-d');
+            exec("python3 $scriptPath --username $escapedUsername --password $escapedPassword --group_id $escapedGroupID --date $date 2>&1", $csvFilePath);
+        }else{
+            exec("python3 $scriptPath --username $escapedUsername --password $escapedPassword --group_id $escapedGroupID 2>&1", $csvFilePath);
+        }
 
         if ($csvFilePath[0] === "Aucun événement trouvé.") {
             throw new NotFoundException('Aucune sortie trouvée');
         }
-
-        // Vérifier si le fichier existe
         if (!file_exists($csvFilePath[0])) {
-            throw new NotFoundException('Le fichier CSV est introuvable');
+            throw new NotFoundException('Le fichier CSV est introuvable : ' . $csvFilePath[0]);
         }
-
-        // Lire le contenu du fichier CSV
         $handle = fopen($csvFilePath[0], 'r');
         if (!$handle) {
             throw new \Exception('Impossible d\'ouvrir le fichier CSV.');
         }
-
-        // Lire la première ligne (en-têtes du fichier CSV)
         $headers = fgetcsv($handle);
         $sortiesJson = [];
-        // Boucler sur chaque ligne du fichier
         while (($data = fgetcsv($handle)) !== false) {
-            // Associe les données aux en-têtes
             $row = array_combine($headers, $data);
-            if (!$this->sortieRepository->findOneBy(['idSpond' => $row['ID']])) {
+            if (!$this->sortieRepository->findOneBy(['idSpond' => $row['ID'] ?? null])) {
                 $sortieJson = [
                     'idSpond' => $row['ID'] ?? null,
                     'lieu' => $row['Lieu'] ?? null,
+                    'titre' => $row['Titre'] ?? null,
                     'dateSortie' => $row['Date'] ?? null,
                     'heure_sortie' => $row['Heure'] ?? null,
-                    'participants' => explode(',', $row['Participants'])
+                    'participants' => isset($row['Participants']) ? explode(',', $row['Participants']) : []
                 ];
                 $sortiesJson[] = $sortieJson;
             }
@@ -177,14 +180,14 @@ class SortieManager implements SortieManagerInterface
     }
 
 
-    function importAllSortie(array $sorties = null): void
+    function importAllSortie(array $sorties = null, DateTime $date = null): void
     {
         if (!$sorties) {
             $donneeClub = $this->donneeClubManager->getDonneeClub();
             $username = $donneeClub->getEmailSpond();
             $password = $this->donneeClubManager->decryptPassword($donneeClub->getPasswordSpond());
             $groupId = $donneeClub->getGroupIdSpond();
-            $sorties = $this->getSortiesSpond($username, $password, $groupId);
+            $sorties = $this->getSortiesSpond($username, $password, $groupId, $date);
         }
         foreach ($sorties as $sortie) {
             $this->processNewFromArray($sortie, $sortie['idSpond']);
@@ -196,13 +199,19 @@ class SortieManager implements SortieManagerInterface
         $newSortie = new Sortie();
         $newSortie->setIdSpond($idSpondSortie);
         $lieu = $this->lieuRepository->findOneBy(['nomLieu' => $sortie['lieu']]);
-        $lieu ? $newSortie->setIdLieu($lieu) :
+        if (!$lieu) {
             $lieu = new Lieu();
             $lieu->setNomLieu($sortie['lieu']);
-            $lieu->setLienMaps("https://www.google.com/maps/place/" . $sortie['lieu']);
+            $lieu->setLienMaps("https://www.google.com/maps/place/" . urlencode($sortie['lieu']));
             $this->entityManager->persist($lieu);
-            $newSortie->setIdLieu($lieu);
-        $newSortie->setType("Mer");
+        }
+        $newSortie->setIdLieu($lieu);
+        //TODO : A modifier
+        if (str_contains($sortie['titre'], 'Piscine')) {
+            $newSortie->setType("Plongée Piscine");
+        }else {
+            $newSortie->setType("Plongée Mer");
+        }
         $admin = $this->utilisateurManager->getPlongeurAdmin();
         $newSortie->setDirecteurPlongee($admin);
         $newSortie->setSecuriteSurface($admin);
@@ -220,40 +229,63 @@ class SortieManager implements SortieManagerInterface
         }
     }
 
+
     // Exemple d'une fonction Symfony qui met à jour le fichier cron
-    public function updateCronJob($intervalle)
+    /*public function updateCronJob($intervalle)
     {
         $cronFile = '/etc/cron.d/spond-cron-job';
-
-        // Supprimer l'ancien job cron
         exec('crontab -r');
-
-        // Définir un nouveau job cron selon l'intervalle
         $cronJob = $this->generateCronJob($intervalle);
-
-        // Sauvegarder la nouvelle tâche cron dans le fichier
         file_put_contents($cronFile, $cronJob);
-
-        // Appliquer la nouvelle configuration de cron
         exec('crontab ' . $cronFile);
-    }
+    }*/
 
-    private function generateCronJob($intervalle)
+    //private function generateCronJob($intervalle)
+    //{
+        //$cronTime = match ($intervalle) {
+         //   '2day' => '0 0 */2 * *',
+         //   '3day' => '0 0 */3 * *',
+         //   '4day' => '0 0 */4 * *',
+         //   '5day' => '0 0 */5 * *',
+         //   '6day' => '0 0 */6 * *',
+         //   '1week' => '0 0 * * 0',
+          //  '1month' => '0 0 1 * *',
+          //  default => '0 0 * * *',
+        //};
+       // return "$cronTime /usr/local/bin/php /var/www/html/neptunedive/bin/console c:iae >> /var/www/html/cron.log 2>&1; echo 'Cron job executed' >> /var/www/html/cron.log\n";
+    //}
+
+
+    public function updateSpondUpdateDate(): void
     {
-        $cronTime = match ($intervalle) {
-            '2day' => '0 0 */2 * *',
-            '3day' => '0 0 */3 * *',
-            '4day' => '0 0 */4 * *',
-            '5day' => '0 0 */5 * *',
-            '6day' => '0 0 */6 * *',
-            '1week' => '0 0 * * 0',
-            '1month' => '0 0 1 * *',
-            default => '0 0 * * *',
-        };
-        return "$cronTime /usr/local/bin/php /var/www/html/neptunedive/bin/console c:iae >> /var/www/html/cron.log 2>&1; echo 'Cron job executed' >> /var/www/html/cron.log\n";
+        $donneeClub = $this->donneeClubManager->getDonneeClub();
+        if ($donneeClub->getLastSpondUpdateDate() && $donneeClub->getLastSpondUpdateDate() >= (new DateTime())->sub($donneeClub->getIntervalSpondUpdate())) {
+            $this->importAllSortie(null, $donneeClub->getLastSpondUpdateDate());
+            $donneeClub->setLastSpondUpdateDate(new DateTime());
+            $this->entityManager->persist($donneeClub);
+            $this->entityManager->flush();
+        }
     }
 
 
-
+    public function updateSpondUpdateInterval($interval): void
+    {
+        $dateInterval = match ($interval) {
+            '2day' => new \DateInterval('P2D'),
+            '3day' => new \DateInterval('P3D'),
+            '4day' => new \DateInterval('P4D'),
+            '5day' => new \DateInterval('P5D'),
+            '6day' => new \DateInterval('P6D'),
+            '1week' => new \DateInterval('P1W'),
+            '2week' => new \DateInterval('P2W'),
+            '1month' => new \DateInterval('P1M'),
+            default => new \DateInterval('P1D'),
+        };
+        $donneeClub = $this->donneeClubManager->getDonneeClub();
+        $donneeClub->setIntervalSpondUpdate($dateInterval);
+        $donneeClub->setLastSpondUpdateDate(new DateTime());
+        $this->entityManager->persist($donneeClub);
+        $this->entityManager->flush();
+    }
 
 }
