@@ -89,7 +89,7 @@ class AssignationPalanquee
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     #[NotBlank(groups: ['assignationPalanquee:write'])]
     #[NotNull(groups: ['assignationPalanquee:write'])]
-    #[Groups(['assignationPalanquee:read', 'assignationPalanquee:write', 'assignationPalanquee:plongeur:read'])]
+    #[Groups(['assignationPalanquee:read', 'assignationPalanquee:write', 'assignationPalanquee:plongeur:read', "sortie:read"])]
     private ?Plongeur $plongeur = null;
 
     #[ORM\ManyToOne(inversedBy: 'plongeurAssignes')]

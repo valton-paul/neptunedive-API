@@ -9,6 +9,7 @@ use App\Exception\MemberNotFoundException;
 use App\Exception\NotAllowedException;
 use App\Exception\NotFoundException;
 use DateException;
+use DateTime;
 use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\OptimisticLockException;
 use Exception;
@@ -67,21 +68,48 @@ interface SortieManagerInterface
      * @param $username
      * @param $password
      * @param $idGroupe
+     * @param $date
      * @return array
      * @throws Exception
      * @throws NotFoundException
      */
-    function getSortiesSpond($username, $password, $idGroupe): array;
+    function getSortiesSpond($username, $password, $idGroupe,  $date): array;
 
     /**
      * @param array $sortie
      * @param $idSpondSortie
-     * @return Sortie
      * @throws \DateMalformedStringException
      * @throws OptimisticLockException
      * @throws ORMException
      */
-    function processNewArray(array $sortie, $idSpondSortie): Sortie;
+    function processNewFromArray(array $sortie, $idSpondSortie): void;
+
+    /**
+     * @param array|null $sorties
+     * @param DateTime|null $date
+     * @throws OptimisticLockException
+     * @throws \DateMalformedStringException
+     * @throws NotFoundException
+     * @throws ORMException
+     */
+    function importAllSortie(array $sorties = null, DateTime $date = null): void;
+
+
+
+    /**
+     * @throws \DateMalformedStringException
+     * @throws OptimisticLockException
+     * @throws \DateInvalidOperationException
+     * @throws NotFoundException
+     * @throws ORMException
+     */
+    public function updateSpondUpdateDate(): void;
+
+    /**
+     * @param $interval
+     * @throws NotFoundException
+     */
+    public function updateSpondUpdateInterval($interval): void;
 
 
 }

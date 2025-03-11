@@ -1,7 +1,7 @@
 import asyncio
 import csv
 from spond import spond
-from datetime import datetime
+from datetime import datetime, timedelta
 import tempfile
 import argparse
 
@@ -13,18 +13,20 @@ parser = argparse.ArgumentParser(description="Spond Script")
 parser.add_argument("--username", required=True, help="Votre email Spond")
 parser.add_argument("--password", required=True, help="Votre mot de passe Spond")
 parser.add_argument("--group_id", required=True, help="Votre ID de groupe Spond")
+parser.add_argument("--date", required=False, help="Date de début de recherche (format : YYYY-MM-DD)")
 args = parser.parse_args()
 
 csv_file_path = tempfile.mktemp(suffix='.csv', dir="/var/www/html/neptunedive/src/ScriptPython/tmpCSV")  # Chemin du fichier CSV
-today = datetime.utcnow()
 
-async def main(username, password, group_id):
+async def main(username, password, group_id, date):
     # Initialisation du client Spond
-    s = spond.Spond(username=username, password=password)
-
     try:
-        # Récupérer les événements à partir de la date du jour
-        event_data = await s.get_events(group_id, min_start=today)
+        s = spond.Spond(username=username, password=password)
+        if date:
+            day = datetime.strptime(date, '%Y-%m-%d')
+        else:
+            day = datetime.utcnow() - timedelta(days=365)
+        event_data = await s.get_events(group_id, min_start=day)
 
         # Vérifier si des événements sont récupérés
         if not event_data:
@@ -48,12 +50,18 @@ async def main(username, password, group_id):
             start_datetime = datetime.strptime(start_timestamp, '%Y-%m-%dT%H:%M:%SZ')
             event_date = start_datetime.date()
             event_time = start_datetime.time()
+            lieu = ''
+            if 'location' in event:
+                if 'feature' in event['location']:
+                    lieu = event['location']['feature']
+                if 'address' in event['location']:
+                    lieu = lieu +", "+event['location']['address']
 
             # Extraire les informations pertinentes pour l'événement
             event_info = {
-                'Titre': event['heading'],
+                'Titre': event['heading'],  # Titre de l'événement
                 'ID': event['id'],
-                'Lieu': event['location']['feature'],
+                'Lieu': lieu,  # Lieu de l'événement
                 'Date': event_date,  # La date seule
                 'Heure': event_time,  # L'heure seule
                 'Participants': ', '.join(accepted_participants)  # Liste des participants
@@ -78,5 +86,7 @@ async def main(username, password, group_id):
         await s.clientsession.close()
 
 # Lancer la fonction principale
-asyncio.run(main(args.username, args.password, args.group_id))
+asyncio.run(main(args.username, args.password, args.group_id, args.date))
+
+
 

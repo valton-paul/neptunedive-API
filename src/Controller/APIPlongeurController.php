@@ -69,14 +69,7 @@ class APIPlongeurController extends AbstractController
     {
         try {
             $data = $request->toArray();
-            $sortie = $this->sortieManager->processNewArray($data, $idSpondSortie);
-            foreach ($data['participants'] as $plongeurName) {
-                $plongeurName = explode(' ', trim($plongeurName));
-                $plongeur = $this->utilisateurManager->getPlongeurByLastnameAndFirstname(trim($plongeurName[1]), trim($plongeurName[0]));
-                if ($plongeur) {
-                    $this->sortieManager->signUpFor($plongeur, $sortie);
-                }
-            }
+            $this->sortieManager->processNewFromArray($data, $idSpondSortie);
             return new JsonResponse(['message' => 'Sortie importée avec succès']);
         } catch (\Exception $e) {
             return new JsonResponse(['error' => $e->getMessage()], 500);
@@ -95,7 +88,7 @@ class APIPlongeurController extends AbstractController
             $password = $donneeClub->getPasswordSpond();
             $password = $this->donneeClubManager->decryptPassword($password);
             $groupId = $donneeClub->getGroupIdSpond();
-            $sortiesJson = $this->sortieManager->getSortiesSpond($username, $password, $groupId);
+            $sortiesJson = $this->sortieManager->getSortiesSpond($username, $password, $groupId, false);
             return new JsonResponse($sortiesJson);
         } catch (NotFoundException $e) {
             return new JsonResponse(['error' => $e->getMessage()], 404);
@@ -123,6 +116,46 @@ class APIPlongeurController extends AbstractController
             return new JsonResponse(['error' => 'Server error : ' . $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
+    }
+
+    #[Route('/donneeClubs/intervalUpdate', name: 'api_interval_update', methods: ['PATCH'])]
+    #[IsGranted('ROLE_ADMIN')]
+    public function intervalUpdate(Request $request): JsonResponse {
+        try {
+            $this->sortieManager->updateSpondUpdateInterval($request->get('interval'));
+            return new JsonResponse(['message' => 'Interval updated']);
+        } catch (\Exception $e) {
+            return new JsonResponse(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    #[Route('/sorties/spondUpdate', name: 'api_spond_update', methods: ['GET'])]
+    #[IsGranted('ROLE_ADMIN')]
+    public function spondUpdate(): JsonResponse {
+        try {
+            if ($this->isGranted('ROLE_ADMIN')) {
+                $this->sortieManager->updateSpondUpdateDate();
+                return new JsonResponse(['message' => 'Spond update date updated']);
+            }
+            return new JsonResponse(['error' => 'Unauthorized'], 401);
+        } catch (\Exception $e) {
+            return new JsonResponse(['error' => $e->getMessage()], 500);
+        } catch (ORMException $e) {
+            return new JsonResponse(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    #[Route('/sorties/spond', name: 'api_import_all', methods: ['POST'])]
+    #[IsGranted('ROLE_MONITEUR')]
+    public function importAllSortie(Request $request): JsonResponse {
+        try {
+            $this->sortieManager->importAllSortie($request->toArray());
+            return new JsonResponse(['message' => 'Sorties importées avec succès']);
+        } catch (\Exception $e) {
+            return new JsonResponse(['error' => $e->getMessage()], 500);
+        } catch (ORMException $e) {
+            return new JsonResponse(['error' => $e->getMessage()], 500);
+        }
     }
 
 }

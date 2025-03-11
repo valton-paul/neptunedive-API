@@ -14,13 +14,11 @@ use Doctrine\Persistence\Event\LifecycleEventArgs;
 class CommentaireListener
 {
 
-    private EntityRepository $commentaireRepository;
+
 
     public function __construct(
-        private DatabaseContextResolver $resolver
     )
     {
-        $this->commentaireRepository = $this->resolver->getRepository(Commentaire::class);
     }
 
 

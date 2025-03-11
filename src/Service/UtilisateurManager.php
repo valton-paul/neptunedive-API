@@ -14,16 +14,13 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class UtilisateurManager implements UtilisateurManagerInterface
 {
-    private EntityManagerInterface $entityManager;
-
 
     public function __construct(
+        private EntityManagerInterface      $entityManager,
         private UserPasswordHasherInterface $passwordHasher,
-        private PlongeurRepository $plongeurRepository,
-        private DatabaseContextResolver $resolver
+        private PlongeurRepository          $plongeurRepository
     )
     {
-        $this->entityManager = $this->resolver->getEntityManager();
     }
 
     public
@@ -83,5 +80,10 @@ class UtilisateurManager implements UtilisateurManagerInterface
     function getPlongeurByLastnameAndFirstname(string $nom, string $prenom): Plongeur|null
     {
         return $this->plongeurRepository->findOneBy(['nom' => $nom, 'prenom' => $prenom]);
+    }
+
+    function getPlongeurAdmin(): Plongeur|null
+    {
+        return $this->plongeurRepository->findByRoleAdmin()[0] ?? null;
     }
 }

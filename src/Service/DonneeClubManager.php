@@ -66,7 +66,12 @@ class DonneeClubManager implements DonneeClubManagerInterface
     function findGroupIdSpond($username, $password, $groupName): string
     {
         $scriptPath = __DIR__ . '/../ScriptPython/groupIdFinder.py';
-        exec("python3 $scriptPath --username $username --password $password --group_name $groupName", $output);
+        $escapedUsername = escapeshellarg($username);
+        $escapedPassword = escapeshellarg($password);
+        $escapedGroupName = escapeshellarg(trim($groupName));
+
+        exec("python3 $scriptPath --username $escapedUsername --password $escapedPassword --group_name $escapedGroupName 2>&1", $output);
+
         if (str_contains($output[0], 'Error')) {
             if (str_contains($output[0], 'group')) {
                 throw new NotFoundException('Groupe introuvable');

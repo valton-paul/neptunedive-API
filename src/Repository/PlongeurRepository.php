@@ -52,6 +52,17 @@ class PlongeurRepository extends EntityRepository implements PasswordUpgraderInt
             ->getResult();
     }
 
+    public function findByRoleAdmin(): array
+    {
+        return $this->createQueryBuilder('p')
+            ->where('p.roles LIKE :role')
+            ->setParameter('role', '%"ROLE_ADMIN"%')
+            ->getQuery()
+            ->getResult();
+    }
+
+
+
     //    /**
     //     * @return Plongeur[] Returns an array of Plongeur objects
     //     */

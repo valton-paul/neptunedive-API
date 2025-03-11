@@ -15,16 +15,14 @@ class GroupNotFoundException(Exception):
 
 async def main(username, password, group_name_to_find):
     # Initialisation du client Spond
-    s = spond.Spond(username=username, password=password)
-
     try:
+        s = spond.Spond(username=username, password=password)
         # Récupérer tous les groupes
         groups = await s.get_groups()
-
         # Rechercher le group_id par le nom du groupe
         group_id = None
         for group in groups:
-            if group['name'] == group_name_to_find:
+            if group['name'].strip() == group_name_to_find:
                 group_id = group['id']
                 break
 
