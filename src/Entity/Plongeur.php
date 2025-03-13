@@ -214,13 +214,13 @@ class Plongeur implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(["plongeur:read"])]
     private ?string $tailleCombinaison = null;
 
-    #[ORM\Column(type: Types::BLOB)]
+    #[ORM\Column(type: Types::BLOB,  nullable: true)]
     private $photoDeProfil = null;
 
-    #[ORM\Column(type: Types::BLOB)]
+    #[ORM\Column(type: Types::BLOB,  nullable: true)]
     private $carteNiveau = null;
 
-    #[ORM\Column(type: Types::BLOB)]
+    #[ORM\Column(type: Types::BLOB,  nullable: true)]
     private $certificatMedical = null;
 
 

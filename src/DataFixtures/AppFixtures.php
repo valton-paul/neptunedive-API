@@ -97,66 +97,168 @@ class AppFixtures extends Fixture
          */
         $plongeurs = [
             [
-                'email' => 'elodie@gmail.com',
-                'nom' => 'Amilhau',
-                'prenom' => 'Elodie',
+                'email' => 'lucas.dupont@gmail.com',
+                'nom' => 'Dupont',
+                'prenom' => 'Lucas',
                 'formation' => true,
-                'moniteur' => false,
                 'plainPassword' => 'Azerty123!',
                 'niveauPlongeeAutonome' => NiveauPlongeeAutonome::PA40,
                 'niveauPlongeeEncadre' => NiveauPlongeeEncadre::PE40,
                 'niveauMoniteur' => NiveauMoniteur::NONE,
-                'roles' => ['ROLE_USER']
+                'roles' => ['ROLE_USER'],
+                'tailleStab' => 'M',
+                'taillePalmes' => '42-44',
+                'possedeMasquePlongee' => true,
+                'tailleCombinaison' => 'L',
+                'isMoniteur' => false
             ],
             [
-                'email' => 'matthieu@gmail.com',
-                'nom' => 'Lopez',
-                'prenom' => 'Matthieu',
+                'email' => 'sophie.martin@gmail.com',
+                'nom' => 'Martin',
+                'prenom' => 'Sophie',
                 'formation' => false,
-                'moniteur' => false,
                 'plainPassword' => 'Azerty123!',
                 'niveauPlongeeAutonome' => NiveauPlongeeAutonome::PA20,
                 'niveauPlongeeEncadre' => NiveauPlongeeEncadre::PE40,
                 'niveauMoniteur' => NiveauMoniteur::NONE,
-                'roles' => ['ROLE_USER']
+                'roles' => ['ROLE_USER'],
+                'tailleStab' => 'S',
+                'taillePalmes' => '38-40',
+                'possedeMasquePlongee' => false,
+                'tailleCombinaison' => 'M',
+                'isMoniteur' => false
             ],
             [
-                'email' => 'anais@gmail.com',
-                'nom' => 'Beauvieux',
-                'prenom' => 'Anais',
+                'email' => 'thomas.leclerc@gmail.com',
+                'nom' => 'Leclerc',
+                'prenom' => 'Thomas',
                 'formation' => false,
-                'moniteur' => true,
                 'plainPassword' => 'Azerty123!',
                 'niveauPlongeeAutonome' => NiveauPlongeeAutonome::PA60,
                 'niveauPlongeeEncadre' => NiveauPlongeeEncadre::PE60,
                 'niveauMoniteur' => NiveauMoniteur::E2,
-                'roles' => ['ROLE_USER', 'ROLE_MONITEUR']
+                'roles' => ['ROLE_USER', 'ROLE_MONITEUR'],
+                'tailleStab' => 'L',
+                'taillePalmes' => '44-46',
+                'possedeMasquePlongee' => true,
+                'tailleCombinaison' => 'XL',
+                'isMoniteur' => false
             ],
             [
-                'email' => 'pascal@gmail.com',
-                'nom' => 'Celka',
-                'prenom' => 'Pascal',
+                'email' => 'marie.durand@gmail.com',
+                'nom' => 'Durand',
+                'prenom' => 'Marie',
                 'formation' => false,
-                'moniteur' => true,
                 'plainPassword' => 'Azerty123!',
                 'niveauPlongeeAutonome' => NiveauPlongeeAutonome::PA60,
                 'niveauPlongeeEncadre' => NiveauPlongeeEncadre::PE60,
                 'niveauMoniteur' => NiveauMoniteur::E2,
-                'roles' => ['ROLE_USER', 'ROLE_MONITEUR']
+                'roles' => ['ROLE_USER', 'ROLE_MONITEUR'],
+                'tailleStab' => 'M',
+                'taillePalmes' => '40-42',
+                'possedeMasquePlongee' => true,
+                'tailleCombinaison' => 'L',
+                'isMoniteur' => false
             ],
             [
-                'email' => 'remi@gmail.com',
-                'nom' => 'Coletta',
-                'prenom' => 'Remi',
+                'email' => 'paul@gmail.com',
+                'nom' => 'Dupont',
+                'prenom' => 'Paul',
                 'formation' => true,
-                'moniteur' => true,
                 'plainPassword' => 'Azerty123!',
                 'niveauPlongeeAutonome' => NiveauPlongeeAutonome::PA60,
                 'niveauPlongeeEncadre' => NiveauPlongeeEncadre::PE60,
                 'niveauMoniteur' => NiveauMoniteur::NONE,
-                'roles' => ['ROLE_USER', 'ROLE_MONITEUR', 'ROLE_ADMIN']
+                'roles' => ['ROLE_USER', 'ROLE_MONITEUR', 'ROLE_ADMIN'],
+                'tailleStab' => 'L',
+                'taillePalmes' => '42-44',
+                'possedeMasquePlongee' => false,
+                'tailleCombinaison' => 'XL',
+                'isMoniteur' => true
+            ],
+            [
+                'email' => 'claire.robert@gmail.com',
+                'nom' => 'Robert',
+                'prenom' => 'Claire',
+                'formation' => false,
+                'plainPassword' => 'Azerty123!',
+                'niveauPlongeeAutonome' => NiveauPlongeeAutonome::PA20,
+                'niveauPlongeeEncadre' => NiveauPlongeeEncadre::PE20,
+                'niveauMoniteur' => NiveauMoniteur::NONE,
+                'roles' => ['ROLE_USER'],
+                'tailleStab' => 'S',
+                'taillePalmes' => '36-38',
+                'possedeMasquePlongee' => true,
+                'tailleCombinaison' => 'M',
+                'isMoniteur' => false
+            ],
+            [
+                'email' => 'nicolas.bernard@gmail.com',
+                'nom' => 'Bernard',
+                'prenom' => 'Nicolas',
+                'formation' => false,
+                'plainPassword' => 'Azerty123!',
+                'niveauPlongeeAutonome' => NiveauPlongeeAutonome::PA40,
+                'niveauPlongeeEncadre' => NiveauPlongeeEncadre::PE40,
+                'niveauMoniteur' => NiveauMoniteur::NONE,
+                'roles' => ['ROLE_USER'],
+                'tailleStab' => 'XL',
+                'taillePalmes' => '44-46',
+                'possedeMasquePlongee' => false,
+                'tailleCombinaison' => 'XXL',
+                'isMoniteur' => false
+            ],
+            [
+                'email' => 'emma.fournier@gmail.com',
+                'nom' => 'Fournier',
+                'prenom' => 'Emma',
+                'formation' => true,
+                'plainPassword' => 'Azerty123!',
+                'niveauPlongeeAutonome' => NiveauPlongeeAutonome::PA40,
+                'niveauPlongeeEncadre' => NiveauPlongeeEncadre::PE40,
+                'niveauMoniteur' => NiveauMoniteur::NONE,
+                'roles' => ['ROLE_USER'],
+                'tailleStab' => 'M',
+                'taillePalmes' => '38-40',
+                'possedeMasquePlongee' => true,
+                'tailleCombinaison' => 'L',
+                'isMoniteur' => false
+            ],
+            [
+                'email' => 'alexandre.lambert@gmail.com',
+                'nom' => 'Lambert',
+                'prenom' => 'Alexandre',
+                'formation' => false,
+                'plainPassword' => 'Azerty123!',
+                'niveauPlongeeAutonome' => NiveauPlongeeAutonome::PA20,
+                'niveauPlongeeEncadre' => NiveauPlongeeEncadre::PE20,
+                'niveauMoniteur' => NiveauMoniteur::NONE,
+                'roles' => ['ROLE_USER'],
+                'tailleStab' => 'L',
+                'taillePalmes' => '42-44',
+                'possedeMasquePlongee' => false,
+                'tailleCombinaison' => 'XL',
+                'isMoniteur' => false
+            ],
+            [
+                'email' => 'lea.dupuis@gmail.com',
+                'nom' => 'Dupuis',
+                'prenom' => 'Léa',
+                'formation' => false,
+                'plainPassword' => 'Azerty123!',
+                'niveauPlongeeAutonome' => NiveauPlongeeAutonome::PA20,
+                'niveauPlongeeEncadre' => NiveauPlongeeEncadre::PE40,
+                'niveauMoniteur' => NiveauMoniteur::NONE,
+                'roles' => ['ROLE_USER'],
+                'tailleStab' => 'M',
+                'taillePalmes' => '38-40',
+                'possedeMasquePlongee' => true,
+                'tailleCombinaison' => 'M',
+                'isMoniteur' => false
             ],
         ];
+
+
 
         $plongeursObjects = [];
         foreach ($plongeurs as $data) {
@@ -165,11 +267,12 @@ class AppFixtures extends Fixture
             $plongeur->setNom($data['nom']);
             $plongeur->setPrenom($data['prenom']);
             $plongeur->setFormation($data['formation']);
-            $plongeur->setMoniteur($data['moniteur']);
+            $plongeur->setMoniteur($data['isMoniteur']);
             $plongeur->setPlainPassword($data['plainPassword']);
             $plongeur->setNiveauPlongeeAutonome($data['niveauPlongeeAutonome']);
             $plongeur->setNiveauPlongeeEncadre($data['niveauPlongeeEncadre']);
             $plongeur->setNiveauMoniteur($data['niveauMoniteur']);
+            $plongeur->setPossedeMasquePlongee($data['possedeMasquePlongee']);
 
             $hashedPassword = $this->passwordHasher->hashPassword($plongeur, $plongeur->getPlainPassword());
             $plongeur->setPassword($hashedPassword);
